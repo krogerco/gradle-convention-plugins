@@ -1,0 +1,43 @@
+[versions]
+androidGradlePlugin = "8.3.0"
+androidJunit5Plugin = "1.10.0.0"
+androidxRoom = "2.6.1"
+catalogVersionsPlugin = "0.8.4"
+dependencyAnalysisPlugin = "1.30.0"
+foojay = "0.8.0"
+dokka = "1.9.20"
+gradleMavenPublishPlugin = "0.28.0"
+gradleVersionsPlugin = "0.51.0"
+hilt = "2.51"
+junit5 = "5.10.1"
+kotlin = "1.9.22"
+kotlinter = "4.3.0"
+koTest = "5.8.0"
+kover = "0.7.6"
+ksp = "1.9.22-1.0.17"
+
+[libraries]
+jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
+jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
+koTest = { module = 'io.kotest:kotest-assertions-core', version.ref = "koTest" }
+
+# plugins for classpath (usually not necessary but are for conventional precompiled gradle plugin usage)
+gradlePlugins-androidJunit5 = { module = "de.mannodermaus.gradle.plugins:android-junit5", version.ref = "androidJunit5Plugin" }
+gradlePlugins-android = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
+gradlePlugins-catalogVersions = { module = "nl.littlerobots.version-catalog-update:nl.littlerobots.version-catalog-update.gradle.plugin", version.ref = "catalogVersionsPlugin" }
+gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin"}
+gradlePlugins-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
+gradlePlugins-foojayResolver = { module = "org.gradle.toolchains:foojay-resolver", version.ref = "foojay" }
+gradlePlugins-gradleVersions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "gradleVersionsPlugin" }
+gradlePlugins-gradleMavenPublishPlugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "gradleMavenPublishPlugin" }
+gradlePlugins-hilt = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt"}
+gradlePlugins-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+gradlePlugins-kotlinter = { module = "org.jmailen.gradle:kotlinter-gradle", version.ref = "kotlinter" }
+gradlePlugins-kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+gradlePlugins-kover = { module = "org.jetbrains.kotlinx:kover-gradle-plugin", version.ref = "kover" }
+gradlePlugins-ksp = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+gradlePlugins-room = { module = "androidx.room:room-gradle-plugin", version.ref = "androidxRoom"}
+
+[plugins]
+kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
+mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "gradleMavenPublishPlugin" }
