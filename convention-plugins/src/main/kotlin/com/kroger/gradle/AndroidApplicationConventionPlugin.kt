@@ -24,9 +24,9 @@
 package com.kroger.gradle
 
 import com.android.build.api.AndroidPluginVersion
+import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.kroger.gradle.config.KgpProperties
 import com.kroger.gradle.config.MIN_SUPPORTED_AGP_VERSION
 import com.kroger.gradle.config.configureHilt
@@ -60,7 +60,7 @@ public class AndroidApplicationConventionPlugin : Plugin<Project> {
                 configureKotlinter(kgpProperties.autoApplyKotlinter)
             }
 
-            extensions.configure<BaseAppModuleExtension> {
+            extensions.configure<ApplicationExtension> {
                 configureKotlinAndroid(this, kgpProperties, ExplicitApiMode.Disabled)
                 defaultConfig {
                     versionCode = 1

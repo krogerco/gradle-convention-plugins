@@ -23,7 +23,6 @@
  */
 package com.kroger.gradle.config
 
-import com.android.build.gradle.internal.utils.KOTLIN_KAPT_PLUGIN_ID
 import dagger.hilt.android.plugin.HiltGradlePlugin
 import kotlinx.kover.gradle.plugin.KoverGradlePlugin
 import org.gradle.api.Project
@@ -62,7 +61,7 @@ internal fun Project.configureDokka(isDokkaEnabled: Boolean, isAndroidProject: B
  */
 internal fun Project.configureHilt(isHiltEnabled: Boolean) {
     if (isHiltEnabled) {
-        pluginManager.apply(KOTLIN_KAPT_PLUGIN_ID)
+        pluginManager.apply("org.jetbrains.kotlin.kapt")
         pluginManager.apply(HiltGradlePlugin::class.java)
 
         hilt()

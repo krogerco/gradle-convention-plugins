@@ -29,6 +29,7 @@ plugins {
     `kotlin-dsl`
     alias(libs.plugins.mavenPublish)
     alias(libs.plugins.kotlinter)
+    alias(libs.plugins.androidLint)
 }
 
 version = System.getenv("BUILD_VERSION")
@@ -117,6 +118,8 @@ dependencies {
     compileOnly(libs.gradlePlugins.kover)
     compileOnly(libs.gradlePlugins.ksp)
     compileOnly(libs.gradlePlugins.room)
+
+    lintChecks(libs.androidx.lint.gradle)
 
     testRuntimeOnly(libs.jupiter.engine)
     testImplementation(libs.jupiter.api)

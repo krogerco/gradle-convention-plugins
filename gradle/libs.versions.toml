@@ -1,6 +1,7 @@
 [versions]
 androidGradlePlugin = "8.3.0"
 androidJunit5Plugin = "1.10.0.0"
+androidxLintGradle = "1.0.0-alpha01"
 androidxRoom = "2.6.1"
 catalogVersionsPlugin = "0.8.4"
 dependencyAnalysisPlugin = "1.30.0"
@@ -17,9 +18,10 @@ kover = "0.7.6"
 ksp = "1.9.22-1.0.17"
 
 [libraries]
+androidx-lint-gradle = { module = "androidx.lint:lint-gradle", version.ref = "androidxLintGradle" }
 jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
 jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
-koTest = { module = 'io.kotest:kotest-assertions-core', version.ref = "koTest" }
+koTest = { module = "io.kotest:kotest-assertions-core", version.ref = "koTest" }
 
 # plugins for classpath (usually not necessary but are for conventional precompiled gradle plugin usage)
 gradlePlugins-androidJunit5 = { module = "de.mannodermaus.gradle.plugins:android-junit5", version.ref = "androidJunit5Plugin" }
@@ -39,5 +41,6 @@ gradlePlugins-ksp = { module = "com.google.devtools.ksp:com.google.devtools.ksp.
 gradlePlugins-room = { module = "androidx.room:room-gradle-plugin", version.ref = "androidxRoom"}
 
 [plugins]
+androidLint = { id = "com.android.lint", version.ref = "androidGradlePlugin" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "gradleMavenPublishPlugin" }

@@ -24,7 +24,7 @@
 package com.kroger.gradle
 
 import com.android.build.api.AndroidPluginVersion
-import com.android.build.gradle.LibraryExtension
+import com.android.build.api.dsl.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.kroger.gradle.config.KgpProperties
 import com.kroger.gradle.config.MIN_SUPPORTED_AGP_VERSION

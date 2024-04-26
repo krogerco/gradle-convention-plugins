@@ -27,6 +27,7 @@ include("convention-plugins")
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        google()
     }
 }
 
