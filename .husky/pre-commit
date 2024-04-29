@@ -1,0 +1,6 @@
+if ! ./gradlew lintKotlin; then
+    echo "pre-commit hook: Some files not properly formatted. Aborting commit."
+    exit 1
+else
+    exit_code=0
+fi
