@@ -249,7 +249,8 @@ By default the `Kotlinter` plugin version specifies what version of `ktlint` is 
 
 ## Dagger
 The following utility functions exist to help configure `Dagger`:
-- **`dagger()`:** adds the `dagger`, `javax:inject`, and `dagger-compiler` dependencies. Optionally adds `dagger-android-processor`, `dagger-android`, and `dagger-android-support` depending on the parameters used.
+- **`daggerKsp()`:** adds the `dagger`, `javax:inject`, and `dagger-compiler` dependencies. Optionally adds `dagger-android-processor`, `dagger-android`, and `dagger-android-support` depending on the parameters used. Uses KSP for annotation processing.
+- **`dagger()`:** (Deprecated) same as `daggerKsp()` but uses KAPT for annotation processing and sets `KaptExtension.correctErrorTypes = true`.
 
 ### Version Catalog Requirements
 The following versions are expected in the Version Catalog when using the `Dagger` utility function:
@@ -264,15 +265,15 @@ The following versions are expected in the Version Catalog when using the `Deep 
 - **`kgpDeepLink`:** The version to use for deep link dependencies.
 
 ## Hilt
-By default when the [Android Application](#android-application) plugin is applied hilt will be auto-configured on the project.
+By default when the [Android Application](#android-application) plugin is applied hilt will be auto-configured on the project using `hiltKapt()`.
 
-Auto-configuration does the following:
-- Applies the KAPT and Hilt Android plugins
-- **`KaptExtension.correctErrorTypes`:** set to true
-- Dependencies
-  - Adds the Hilt Android Compiler dependency to the `kapt`, `kaptTest`, and `kaptAndroidTest` configurations.
+The following utility functions exist to help configure `Hilt` when auto-configuration is not in use:
+- **`hiltKsp()`:**
+  - Adds the Hilt Android Compiler dependency to the `ksp`, `kspTest`, and `kspAndroidTest` configurations.
   - Adds the Hilt Android Testing dependency to the `testImplementation` and `AndroidTestImplementation` configurations.
-  > **Note**: if using Hilt with androidx dependencies you must add the androidx hilt compiler and other needed dependencies.
+  - Adds the Androidx Hilt Compiler dependency to the `ksp` configuration when the `androidxHiltCompilter` parameter is true. Default is `false`.
+- **`hilt()` (Deprecated):**
+  - Same as `hiltKsp()` except KAPT is used for annotation processing and sets `KaptExtension.correctErrorTypes = true`.
 
 ### Version Catalog Requirements
 The following versions are expected in the Version Catalog when using Hilt auto-configuration:
@@ -280,9 +281,10 @@ The following versions are expected in the Version Catalog when using Hilt auto-
 - **`kgpAndroidxHiltCompiler`:** The version of the hilt compiler to use for compatible androidx library processing.
 
 ### Properties
-The following properties are used in the `gradle.properties` file of projects to control how auto-configuration is applied:
-- **`kgp.android.autoconfigure.hilt.application`:** if true then Hilt will be auto-configured when the [Android Application](#android-application) plugin is applied. Default is true.
-- **`kgp.android.autoconfigure.hilt.library`:** if true then Hilt will be auto-configured when the [Android Library](#published-android-library) plugin is applied. Default is false.
+The following properties are used in the `gradle.properties` file of projects to control how auto-configuration is applied.
+These properties are deprecated and will be removed in a future release:
+- **`kgp.android.autoconfigure.hilt.application` (Deprecated):** if true then Hilt will be auto-configured when the [Android Application](#android-application) plugin is applied. Default is true.
+- **`kgp.android.autoconfigure.hilt.library` (Deprecated):** if true then Hilt will be auto-configured when the [Android Library](#published-android-library) plugin is applied. Default is false.
 
 ## Java API Desugaring
 Enabling desugaring allows the use of newer Java APIs in older versions of Java. Desugaring can be auto-configured when the [Android Application](#android-application) plugin or the [Published Android Library](#published-android-library) plugin is applied.
@@ -360,7 +362,7 @@ The following property is used in the root `gradle.properties` file to control h
 
 ## Room
 The following utility functions exist to help configure `Room`:
-- **`room()`:** adds the `room-runtime`, `room-ktx`, `room-compiler` dependencies. `room-testing` and the room plugin are also added/applied if a `schemaDirectory` is specified.
+- **`room()`:** adds the `room-runtime`, `room-ktx`, `room-compiler` dependencies. `room-testing` and the room plugin are also added/applied if a `schemaDirectoryPath` is specified. The default `schemaDirectoryPath` is `{projectDir}/schemas`.
 
 ### Version Catalog Requirements
 The following versions are expected in the Version Catalog when using the `room` utility functions:
