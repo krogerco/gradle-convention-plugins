@@ -230,11 +230,11 @@ private fun Project.commonRoomConfig(
 /**
  * Adds Room dependencies and ksp processor.
  * This requires the Version Catalog to have an "androidxRoom" version.
- * @param schemaDirectoryPath where Room should generate schema json files for the database
+ * @param schemaDirectoryPath where Room should generate schema json files for the database. Default is projectDir/schemas.
  * @param commonExtension used to add [schemaDirectoryPath] to androidTest source set if needed
  */
 public fun Project.room(
-    schemaDirectoryPath: Provider<String?>,
+    schemaDirectoryPath: Provider<String?> = provider { project.layout.projectDirectory.dir("schemas").asFile.absolutePath },
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
     val roomVersion = KgpProperties(project).kgpVersions.kgpRoom
