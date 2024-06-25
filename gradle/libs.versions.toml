@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "8.3.0"
+androidGradlePlugin = "8.5.0"
 androidJunit5Plugin = "1.10.0.0"
 androidxLintGradle = "1.0.0-alpha01"
 androidxRoom = "2.6.1"
