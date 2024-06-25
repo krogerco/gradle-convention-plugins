@@ -53,12 +53,47 @@ public fun Project.coreLibraryDesugaring() {
 }
 
 /**
- * Adds hilt android and hilt android compiler dependencies.
+ * Adds hilt android and hilt android compiler KSP dependencies.
  * This requires the Version Catalog to have a "dagger" version.
  * An `androidxHiltCompiler` version is required when [androidxHiltCompiler] is true
  * @param androidxHiltCompiler whether or not to also add the androidx hilt compiler
  */
-public fun Project.hilt(androidxHiltCompiler: Boolean = false) {
+public fun Project.hiltKsp(androidxHiltCompiler: Boolean = false) {
+    val versions = KgpProperties(project).kgpVersions
+    val daggerVersion = versions.kgpDagger
+
+    dependencies {
+        add(Configurations.IMPLEMENTATION, "javax.inject:javax.inject:1")
+        add(Configurations.IMPLEMENTATION, "com.google.dagger:hilt-android:$daggerVersion")
+        add(Configurations.KSP, "com.google.dagger:hilt-compiler:$daggerVersion")
+
+        add(Configurations.TEST_IMPLEMENTATION, "com.google.dagger:hilt-android-testing:$daggerVersion")
+        add(Configurations.KSP_TEST, "com.google.dagger:hilt-compiler:$daggerVersion")
+
+        add(Configurations.ANDROID_TEST_IMPLEMENTATION, "com.google.dagger:hilt-android-testing:$daggerVersion")
+        add(Configurations.KSP_ANDROID_TEST, "com.google.dagger:hilt-compiler:$daggerVersion")
+        if (androidxHiltCompiler) {
+            val androidxHiltCompilerVersion = versions.kgpAndroidxHiltCompiler
+            add(Configurations.KSP, "androidx.hilt:hilt-compiler:$androidxHiltCompilerVersion")
+        }
+    }
+}
+
+/**
+ * Adds hilt android and hilt android compiler KAPT dependencies.
+ * This requires the Version Catalog to have a "dagger" version.
+ * An `androidxHiltCompiler` version is required when [androidxHiltCompiler] is true
+ * @param androidxHiltCompiler whether or not to also add the androidx hilt compiler
+ */
+@Deprecated(
+    message = "Migrate to ksp by using hiltKsp()",
+    replaceWith = ReplaceWith(
+        expression = "hiltKsp()",
+    ),
+)
+public fun Project.hilt(
+    androidxHiltCompiler: Boolean = false,
+) {
     val versions = KgpProperties(project).kgpVersions
     val daggerVersion = versions.kgpDagger
 
@@ -78,18 +113,49 @@ public fun Project.hilt(androidxHiltCompiler: Boolean = false) {
         add(Configurations.KAPT_ANDROID_TEST, "com.google.dagger:hilt-android-compiler:$daggerVersion")
         if (androidxHiltCompiler) {
             val androidxHiltCompilerVersion = versions.kgpAndroidxHiltCompiler
-            project.dependencies.add("kapt", "androidx.hilt:hilt-compiler:$androidxHiltCompilerVersion")
+            add(Configurations.KAPT, "androidx.hilt:hilt-compiler:$androidxHiltCompilerVersion")
         }
     }
 }
 
 /**
- * Adds dagger dependencies and optionally dagger-android and dagger-android-support.
+ * Adds dagger KSP dependencies and optionally dagger-android and dagger-android-support.
  * This requires the Version Catalog to have a "dagger" version.
  * @param daggerAndroid whether or not to also add the dagger-android dependencies
  * @param daggerAndroidSupport whether or not to also add the dagger-android-support dependencies. When true
  * this also adds dagger-android dependencies
  */
+public fun Project.daggerKsp(daggerAndroid: Boolean = false, daggerAndroidSupport: Boolean = false) {
+    val daggerVersion = KgpProperties(project).kgpVersions.kgpDagger
+
+    dependencies {
+        add(Configurations.IMPLEMENTATION, "com.google.dagger:dagger:$daggerVersion")
+        add(Configurations.IMPLEMENTATION, "javax.inject:javax.inject:1")
+        add(Configurations.KSP, "com.google.dagger:dagger-compiler:$daggerVersion")
+
+        if (daggerAndroid || daggerAndroidSupport) {
+            add(Configurations.KSP, "com.google.dagger:dagger-android-processor:$daggerVersion")
+            add(Configurations.IMPLEMENTATION, "com.google.dagger:dagger-android:$daggerVersion")
+            if (daggerAndroidSupport) {
+                add(Configurations.IMPLEMENTATION, "com.google.dagger:dagger-android-support:$daggerVersion")
+            }
+        }
+    }
+}
+
+/**
+ * Adds dagger KAPT dependencies and optionally dagger-android and dagger-android-support.
+ * This requires the Version Catalog to have a "dagger" version.
+ * @param daggerAndroid whether or not to also add the dagger-android dependencies
+ * @param daggerAndroidSupport whether or not to also add the dagger-android-support dependencies. When true
+ * this also adds dagger-android dependencies
+ */
+@Deprecated(
+    message = "Migrate to ksp by using daggerKsp()",
+    replaceWith = ReplaceWith(
+        expression = "daggerKsp()",
+    ),
+)
 public fun Project.dagger(daggerAndroid: Boolean = false, daggerAndroidSupport: Boolean = false) {
     val daggerVersion = KgpProperties(project).kgpVersions.kgpDagger
     extensions.configure<KaptExtension> {
