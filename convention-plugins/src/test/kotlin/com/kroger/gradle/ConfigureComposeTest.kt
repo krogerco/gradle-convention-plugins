@@ -70,7 +70,7 @@ class ConfigureComposeTest {
                         listOf("implementation", "debugImplementation", "androidTestImplementation").forEach { configurationName ->
                             configurations.named(configurationName).configure {
                                 println("CONFIGURATION NAME: ${"$"}name")
-                                dependencies.forEach { println("\tDEPENDENCY: ${"$"}{it.group}:${"$"}{it.name}:${"$"}{it.version}") }
+                                dependencies.forEach { println("${"$"}name(${"$"}{it.group}:${"$"}{it.name}:${"$"}{it.version})") }
                                 println()
                             }
                         }
@@ -153,11 +153,12 @@ class ConfigureComposeTest {
             .output
 
         output.shouldContainAll(
-            "DEPENDENCY: androidx.compose:compose-bom:2022.12.00",
-            "DEPENDENCY: androidx.compose.ui:ui-tooling-preview:null",
-            "DEPENDENCY: androidx.compose.ui:ui-tooling:null",
-            "DEPENDENCY: androidx.compose.ui:ui-test-manifest:null",
-            "DEPENDENCY: androidx.compose.ui:ui-test-junit4:null",
+            "implementation(androidx.compose:compose-bom:2022.12.00)",
+            "androidTestImplementation(androidx.compose:compose-bom:2022.12.00)",
+            "implementation(androidx.compose.ui:ui-tooling-preview:null)",
+            "debugImplementation(androidx.compose.ui:ui-tooling:null)",
+            "debugImplementation(androidx.compose.ui:ui-test-manifest:null)",
+            "androidTestImplementation(androidx.compose.ui:ui-test-junit4:null)",
         )
     }
 
@@ -172,7 +173,7 @@ class ConfigureComposeTest {
             .build()
             .output
 
-        output.shouldContain("DEPENDENCY: androidx.compose.material:material:null")
+        output.shouldContain("implementation(androidx.compose.material:material:null)")
     }
 
     @Test
@@ -187,9 +188,9 @@ class ConfigureComposeTest {
             .output
 
         output.shouldContainAll(
-            "DEPENDENCY: androidx.compose.material:material-icons-core:null",
-            "DEPENDENCY: androidx.compose.material3:material3:null",
-            "DEPENDENCY: androidx.compose.material3:material3-window-size-class:null",
+            "implementation(androidx.compose.material:material-icons-core:null)",
+            "implementation(androidx.compose.material3:material3:null)",
+            "implementation(androidx.compose.material3:material3-window-size-class:null)",
         )
     }
 
@@ -212,7 +213,7 @@ class ConfigureComposeTest {
             .build()
             .output
 
-        output.shouldContain("DEPENDENCY: androidx.activity:activity-compose:1.5.1")
-        output.shouldContain("DEPENDENCY: androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
+        output.shouldContain("implementation(androidx.activity:activity-compose:1.5.1)")
+        output.shouldContain("implementation(androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1)")
     }
 }
