@@ -265,7 +265,7 @@ The following versions are expected in the Version Catalog when using the `Deep 
 - **`kgpDeepLink`:** The version to use for deep link dependencies.
 
 ## Hilt
-By default when the [Android Application](#android-application) plugin is applied hilt will be auto-configured on the project using `hiltKapt()`.
+By default when the [Android Application](#android-application) plugin is applied hilt will be auto-configured on the project using `hilt()`.
 
 The following utility functions exist to help configure `Hilt` when auto-configuration is not in use:
 - **`hiltKsp()`:**
