@@ -132,11 +132,10 @@ internal class KgpProperties private constructor(private val project: Project) {
     }
 }
 
-private fun <T> ExtensionAware.getOrCreateExtra(key: String, body: () -> T): T {
-    return if (extra.has(key)) {
+private fun <T> ExtensionAware.getOrCreateExtra(key: String, body: () -> T): T =
+    if (extra.has(key)) {
         @Suppress("UNCHECKED_CAST")
         extra.get(key) as T
     } else {
         body().also { extra.set(key, it) }
     }
-}
