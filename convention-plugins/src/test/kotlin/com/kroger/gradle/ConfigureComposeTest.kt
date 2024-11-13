@@ -84,7 +84,6 @@ class ConfigureComposeTest {
     @Test
     fun `GIVEN compose autoconfigure disabled WHEN gradle configuration runs THEN compose related versions are not needed`() {
         testProjectBuilder.versionCatalogSpec.versions.apply {
-            remove("kgpAndroidxComposeBom")
             remove("kgpAndroidxComposeCompiler")
         }
         testProjectBuilder.withProperties {

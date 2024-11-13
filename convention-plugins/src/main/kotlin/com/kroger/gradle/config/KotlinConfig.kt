@@ -38,6 +38,7 @@ internal fun Project.configureKotlinAndroid(
 ) {
     val kgpVersions = kgpProperties.kgpVersions
     configureKotlin(kgpVersions, explicitApiMode)
+    composeBom()
     with(commonExtension) {
         compileSdk = kgpVersions.kgpCompileSdk
 

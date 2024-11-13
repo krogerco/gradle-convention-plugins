@@ -391,4 +391,16 @@ class DependencyTests {
             "Has serialization plugin = true",
         )
     }
+
+    @Test
+    fun `GIVEN android plugin applied THEN compose BOM imported`() {
+        testProjectBuilder.build()
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+        output.shouldContainAll(
+            "implementation(androidx.compose:compose-bom:2022-12-00)",
+            "androidTestImplementation(androidx.compose:compose-bom:2022-12-00)",
+        )
+    }
 }
