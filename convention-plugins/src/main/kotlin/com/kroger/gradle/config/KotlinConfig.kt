@@ -38,6 +38,7 @@ internal fun Project.configureKotlinAndroid(
 ) {
     val kgpVersions = kgpProperties.kgpVersions
     configureKotlin(kgpVersions, explicitApiMode)
+    composeBom()
     with(commonExtension) {
         compileSdk = kgpVersions.kgpCompileSdk
 
@@ -46,7 +47,9 @@ internal fun Project.configureKotlinAndroid(
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
 
-        configureCompose(commonExtension)
+        if (kgpProperties.autoConfigureCompose) {
+            configureCompose(commonExtension)
+        }
 
         compileOptions {
             isCoreLibraryDesugaringEnabled = kgpProperties.autoConfigureCoreLibraryDesugaring
@@ -74,15 +77,13 @@ internal fun Project.configureKotlin(kgpVersions: KgpVersions, explicitApiMode: 
 }
 
 /**
- * Configures compose if compose auto-configuration is enabled.
+ * Enables the compose build feature and sets the compose compiler version.
+ * If auto-configure compose dependencies is enabled, the dependencies are added.
  */
 public fun Project.configureCompose(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
     val kgpProperties = KgpProperties(this)
-    if (!kgpProperties.autoConfigureCompose) {
-        return
-    }
 
     with(commonExtension) {
         val kgpVersions = kgpProperties.kgpVersions

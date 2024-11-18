@@ -84,7 +84,6 @@ class ConfigureComposeTest {
     @Test
     fun `GIVEN compose autoconfigure disabled WHEN gradle configuration runs THEN compose related versions are not needed`() {
         testProjectBuilder.versionCatalogSpec.versions.apply {
-            remove("kgpAndroidxComposeBom")
             remove("kgpAndroidxComposeCompiler")
         }
         testProjectBuilder.withProperties {
@@ -93,6 +92,26 @@ class ConfigureComposeTest {
         testProjectBuilder.build()
         gradleRunner(testProjectDir, ":android-library-module:tasks")
             .build()
+    }
+
+    @Test
+    fun `GIVEN compose autoconfigure disabled WHEN configureCompose manually called THEN compose related versions are needed`() {
+        testProjectBuilder.withProperties {
+            put("kgp.android.autoconfigure.compose", "false")
+        }
+        testProjectBuilder.configureSubproject("android-library-module") {
+            withImportStatements {
+                add("import com.kroger.gradle.config.*")
+                add("import com.android.build.gradle.LibraryExtension")
+            }
+            appendBuildFile("configureCompose(android)")
+        }
+        testProjectBuilder.build()
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldContain("implementation(androidx.compose:compose-bom:2022.12.00)")
     }
 
     @Test

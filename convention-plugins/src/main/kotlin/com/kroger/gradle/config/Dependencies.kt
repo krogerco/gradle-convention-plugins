@@ -356,17 +356,22 @@ public fun Project.junitVintage() {
 
 // region compose
 /**
- * Adds the required dependencies for preview support in Android Studio and testing.
- * This requires the Version Catalog to have an `androidxComposeBom` version.
+ * Imports the compose BOM. This requires the Version Catalog to have an `kgpAndroidxComposeBom` version.
  */
-public fun Project.composeBasic() {
+internal fun Project.composeBom() {
     val composeBomVersion = KgpProperties(project).kgpVersions.kgpComposeBom
     dependencies {
-        // Compose BOM
         val composeBom = platform("androidx.compose:compose-bom:$composeBomVersion")
         add(Configurations.IMPLEMENTATION, composeBom)
         add(Configurations.ANDROID_TEST_IMPLEMENTATION, composeBom)
+    }
+}
 
+/**
+ * Adds the required dependencies for preview support in Android Studio and testing.
+ */
+public fun Project.composeBasic() {
+    dependencies {
         // Android Studio preview support
         add(Configurations.IMPLEMENTATION, "androidx.compose.ui:ui-tooling-preview")
         add(Configurations.DEBUG_IMPLEMENTATION, "androidx.compose.ui:ui-tooling")
