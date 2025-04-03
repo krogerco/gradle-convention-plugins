@@ -49,9 +49,6 @@ internal class KgpVersions(private val catalog: VersionCatalog) {
             IllegalStateException("Missing \"kgpCompose\" bundle in Version Catalog")
         }
 
-    val kgpComposeCompiler: String
-        get() = getVersion("kgpAndroidxComposeCompiler")
-
     val kgpDagger: String
         get() = getVersion("kgpDagger")
 

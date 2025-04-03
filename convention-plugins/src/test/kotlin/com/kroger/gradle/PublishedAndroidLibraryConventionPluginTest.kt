@@ -46,7 +46,6 @@ class PublishedAndroidLibraryConventionPluginTest {
         testProjectBuilder = rootProject(projectDir = testProjectDir) {
             versionCatalogSpec.versions.apply {
                 put("kgpAndroidDesugarJdkLibs", "\"1.0.0\"")
-                put("kgpAndroidxComposeCompiler", "\"1.3.2\"")
                 put("kgpAndroidxComposeBom", "\"2022-12-00\"")
                 put("kgpCompileSdk", "\"32\"")
                 put("kgpDokka", "\"1.8.20\"")
@@ -150,7 +149,9 @@ class PublishedAndroidLibraryConventionPluginTest {
             .build()
             .output
 
-        output.shouldNotContain("dokka")
+        output
+            .substringAfter("Task :android-library-module:tasks") // in the current version of dokka there are warnings printed
+            .shouldNotContain("dokka")
     }
 
     @Test
@@ -163,6 +164,7 @@ class PublishedAndroidLibraryConventionPluginTest {
             .buildAndFail()
             .output
 
-        output.shouldContain("Missing version catalog with name: libs")
+        output
+            .shouldContain("Missing version catalog with name: libs")
     }
 }
