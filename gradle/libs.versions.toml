@@ -1,32 +1,36 @@
 [versions]
-androidGradlePlugin = "8.5.0"
-androidJunit5Plugin = "1.10.0.0"
-androidxLintGradle = "1.0.0-alpha01"
-androidxRoom = "2.6.1"
-catalogVersionsPlugin = "0.8.4"
-dependencyAnalysisPlugin = "1.30.0"
-foojay = "0.8.0"
-dokka = "1.9.20"
-gradleMavenPublishPlugin = "0.28.0"
-gradleVersionsPlugin = "0.51.0"
-hilt = "2.51.1"
-junit5 = "5.10.1"
-kotlin = "1.9.22"
-kotlinter = "4.4.1"
-koTest = "5.8.0"
-kover = "0.7.6"
-ksp = "1.9.22-1.0.17"
+androidGradlePlugin = "8.9.1"
+androidJunit5Plugin = "1.12.0.0"
+androidxLintGradle = "1.0.0-alpha03"
+androidxRoom = "2.7.0"
+catalogVersionsPlugin = "0.8.5"
+dependencyAnalysisPlugin = "2.13.3"
+foojay = "0.9.0"
+dokka = "2.0.0"
+gradleMavenPublishPlugin = "0.31.0"
+gradleVersionsPlugin = "0.52.0"
+hilt = "2.56.2"
+junitBom = "5.12.0"
+kotlin = "2.1.20"
+kotlinter = "5.0.2"
+koTest = "5.9.1"
+kover = "0.8.3"
+ksp = "2.1.20-1.0.32"
 
 [libraries]
 androidx-lint-gradle = { module = "androidx.lint:lint-gradle", version.ref = "androidxLintGradle" }
-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junitBom" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api"}
+jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
+
 koTest = { module = "io.kotest:kotest-assertions-core", version.ref = "koTest" }
 
 # plugins for classpath (usually not necessary but are for conventional precompiled gradle plugin usage)
 gradlePlugins-androidJunit5 = { module = "de.mannodermaus.gradle.plugins:android-junit5", version.ref = "androidJunit5Plugin" }
 gradlePlugins-android = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
 gradlePlugins-catalogVersions = { module = "nl.littlerobots.version-catalog-update:nl.littlerobots.version-catalog-update.gradle.plugin", version.ref = "catalogVersionsPlugin" }
+gradlePlugins-compose = { module = "org.jetbrains.kotlin.plugin.compose:org.jetbrains.kotlin.plugin.compose.gradle.plugin", version.ref = "kotlin" }
 gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin"}
 gradlePlugins-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 gradlePlugins-foojayResolver = { module = "org.gradle.toolchains:foojay-resolver", version.ref = "foojay" }
