@@ -34,6 +34,10 @@ plugins {
 
 version = System.getenv("BUILD_VERSION")
 
+lint {
+    baseline = file("lint-baseline.xml")
+}
+
 kotlin {
     explicitApi()
 }
@@ -108,6 +112,7 @@ gradlePlugin {
 dependencies {
     compileOnly(libs.gradlePlugins.android)
     compileOnly(libs.gradlePlugins.androidJunit5)
+    compileOnly(libs.gradlePlugins.compose)
     compileOnly(libs.gradlePlugins.dependencyAnalysis)
     compileOnly(libs.gradlePlugins.dokka)
     compileOnly(libs.gradlePlugins.gradleMavenPublishPlugin)
@@ -121,7 +126,9 @@ dependencies {
 
     lintChecks(libs.androidx.lint.gradle)
 
+    testImplementation(platform(libs.junit.bom))
     testRuntimeOnly(libs.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.jupiter.api)
     testImplementation(libs.koTest)
 
