@@ -102,6 +102,8 @@ class PublishedKotlinLibraryConventionPluginTest {
             .build()
             .output
 
-        output.shouldNotContain("dokka")
+        output
+            .substringAfter("Task :kotlin-module:tasks") // in the current version of dokka there are warnings printed
+            .shouldNotContain("dokka")
     }
 }

@@ -83,34 +83,29 @@ internal fun Project.configureKotlin(kgpVersions: KgpVersions, explicitApiMode: 
 public fun Project.configureCompose(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
+    pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
     val kgpProperties = KgpProperties(this)
+    val kgpVersions = kgpProperties.kgpVersions
+    commonExtension.buildFeatures.compose = true
 
-    with(commonExtension) {
-        val kgpVersions = kgpProperties.kgpVersions
-        buildFeatures.compose = true
-        composeOptions {
-            kotlinCompilerExtensionVersion = kgpVersions.kgpComposeCompiler
-        }
-
-        dependencies.apply {
-            composeBasic()
-            logger.info("autoconfigureComposeSetting = ${kgpProperties.autoConfigureComposeDependencies}")
-            when (kgpProperties.autoConfigureComposeDependencies) {
-                ComposeDependencies.BUNDLE -> {
-                    val composeBundle = kgpVersions.kgpComposeBundle
-                    add(Configurations.IMPLEMENTATION, composeBundle)
-                }
-
-                ComposeDependencies.MATERIAL -> {
-                    composeMaterial()
-                }
-
-                ComposeDependencies.MATERIAL3 -> {
-                    composeMaterial3()
-                }
-
-                ComposeDependencies.NONE -> Unit
+    dependencies.apply {
+        composeBasic()
+        logger.info("autoconfigureComposeSetting = ${kgpProperties.autoConfigureComposeDependencies}")
+        when (kgpProperties.autoConfigureComposeDependencies) {
+            ComposeDependencies.BUNDLE -> {
+                val composeBundle = kgpVersions.kgpComposeBundle
+                add(Configurations.IMPLEMENTATION, composeBundle)
             }
+
+            ComposeDependencies.MATERIAL -> {
+                composeMaterial()
+            }
+
+            ComposeDependencies.MATERIAL3 -> {
+                composeMaterial3()
+            }
+
+            ComposeDependencies.NONE -> Unit
         }
     }
 }
