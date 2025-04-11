@@ -24,12 +24,19 @@
 package com.kroger.gradle.config
 
 import com.android.build.api.dsl.CommonExtension
+import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.HasConfigurableKotlinCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 internal fun Project.configureKotlinAndroid(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
@@ -52,6 +59,9 @@ internal fun Project.configureKotlinAndroid(
         }
 
         compileOptions {
+            val javaVersion = JavaVersion.toVersion(kgpVersions.kgpJvmTarget)
+            sourceCompatibility = javaVersion
+            targetCompatibility = javaVersion
             isCoreLibraryDesugaringEnabled = kgpProperties.autoConfigureCoreLibraryDesugaring
         }
 
@@ -66,9 +76,25 @@ internal fun Project.configureKotlinAndroid(
 }
 
 internal fun Project.configureKotlin(kgpVersions: KgpVersions, explicitApiMode: ExplicitApiMode) {
-    extensions.configure<KotlinProjectExtension> {
+    extensions.configure<KotlinBaseExtension> {
         jvmToolchain(kgpVersions.kgpJdk)
         explicitApi = explicitApiMode
+        val isKotlinAndroid = this is KotlinAndroidExtension
+        if (this is HasConfigurableKotlinCompilerOptions<*>) {
+            compilerOptions {
+                kgpVersions.kgpKotlinLanguageVersion?.let { languageVersion = KotlinVersion.fromVersion(it) }
+                kgpVersions.kgpKotlinApiVersion?.let { apiVersion = KotlinVersion.fromVersion(it) }
+                if (this is KotlinJvmCompilerOptions) {
+                    val jvmTargetProvider = provider { JvmTarget.fromTarget(kgpVersions.kgpJvmTarget.toString()) }
+                    jvmTarget = jvmTargetProvider
+
+                    if (!isKotlinAndroid) {
+                        // https://jakewharton.com/kotlins-jdk-release-compatibility-flag
+                        freeCompilerArgs.add(jvmTargetProvider.map { "-Xjdk-release=${it.target}" })
+                    }
+                }
+            }
+        }
     }
 
     tasks.withType<Test>().configureEach {
