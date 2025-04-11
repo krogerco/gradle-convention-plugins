@@ -43,6 +43,9 @@ When using the convention plugins certain versions are expected to be in the ver
 
 The following versions are required in the version catalog:
 - **kgpJdk**: The JDK version to use when setting `jvmToolchain`.
+- **kgpJvmTarget**: Defaults to the kgpJdk version but can be overridden to set the JVM target version if different.
+- **kgpKotlinApiVersion**: The Kotlin API version to use. Defaults to the Kotlin Gradle Plugin version.
+- **kgpKotlinLanguageVersion**: The Kotlin language version to use. Defaults to the Kotlin Gradle Plugin version.
 
 The following versions are required in the version catalog when using Android convention plugins:
 - **kgpCompileSdk**: The SDK version the application compiles against.

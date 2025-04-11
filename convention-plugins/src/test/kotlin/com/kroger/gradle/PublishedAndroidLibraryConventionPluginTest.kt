@@ -26,6 +26,7 @@ package com.kroger.gradle
 import com.kroger.gradle.util.JDK_VERSION
 import com.kroger.gradle.util.KOTLIN_VERSION
 import com.kroger.gradle.util.RootTestProjectBuilder
+import com.kroger.gradle.util.TestProjectBuilder
 import com.kroger.gradle.util.gradleRunner
 import com.kroger.gradle.util.rootProject
 import com.kroger.gradle.util.shouldContainAll
@@ -166,5 +167,71 @@ class PublishedAndroidLibraryConventionPluginTest {
 
         output
             .shouldContain("Missing version catalog with name: libs")
+    }
+
+    @Test
+    fun `WHEN published android library plugin applied with no java or kotlin overrides set THEN expected defaults used`() {
+        testProjectBuilder.configureSubproject("android-library-module") {
+            printJavaAndKotlinVersions()
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "Kotlin API Version: null",
+            "Kotlin Language Version: null",
+            "Java Source Compatibility: $JDK_VERSION",
+            "Java Target Compatibility: $JDK_VERSION",
+        )
+    }
+
+    @Test
+    fun `WHEN published android library plugin applied with java and kotlin overrides set THEN override values are used`() {
+        val jvmTarget = "11"
+        val kotlinVersion = "1.9"
+        testProjectBuilder.versionCatalogSpec.versions.apply {
+            put("kgpJvmTarget", "\"$jvmTarget\"")
+            put("kgpKotlinApiVersion", "\"$kotlinVersion\"")
+            put("kgpKotlinLanguageVersion", "\"$kotlinVersion\"")
+        }
+        testProjectBuilder.configureSubproject("android-library-module") {
+            printJavaAndKotlinVersions()
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "Kotlin API Version: $kotlinVersion",
+            "Kotlin Language Version: $kotlinVersion",
+            "Java Source Compatibility: $jvmTarget",
+            "Java Target Compatibility: $jvmTarget",
+        )
+    }
+
+    private fun TestProjectBuilder.printJavaAndKotlinVersions() {
+        appendBuildFile(
+            """
+                afterEvaluate {
+                    kotlin {
+                        compilerOptions {
+                            println("Kotlin API Version: ${"$"}{apiVersion.orNull?.version}")
+                            println("Kotlin Language Version: ${"$"}{languageVersion.orNull?.version}")
+                        }
+                    }
+                    android {
+                        compileOptions {
+                            println("Java Source Compatibility: ${"$"}{sourceCompatibility}")
+                            println("Java Target Compatibility: ${"$"}{targetCompatibility}")
+                        }
+                    }
+                }    
+            """.trimIndent(),
+        )
     }
 }
