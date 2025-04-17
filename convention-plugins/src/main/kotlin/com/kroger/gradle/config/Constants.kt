@@ -38,6 +38,8 @@ public object Configurations {
     public const val KAPT_ANDROID_TEST: String = "kaptAndroidTest"
     public const val KAPT_TEST: String = "kaptTest"
     public const val KSP: String = "ksp"
+    public const val KSP_ANDROID_TEST: String = "kspAndroidTest"
+    public const val KSP_TEST: String = "kspTest"
     public const val TEST_API: String = "testApi"
     public const val TEST_IMPLEMENTATION: String = "testImplementation"
     public const val TEST_RUNTIME_ONLY: String = "testRuntimeOnly"
