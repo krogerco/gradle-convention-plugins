@@ -44,7 +44,6 @@ class AndroidApplicationConventionPluginTest {
     fun init() {
         testProjectBuilder = rootProject(projectDir = testProjectDir) {
             versionCatalogSpec.versions.apply {
-                put("kgpAndroidxComposeCompiler", "\"1.3.2\"")
                 put("kgpAndroidxComposeBom", "\"2022-12-00\"")
                 put("kgpCompileSdk", "\"32\"")
                 put("kgpDagger", "\"32\"")
@@ -57,6 +56,7 @@ class AndroidApplicationConventionPluginTest {
             addPlugin("com.kroger.gradle.android-application-conventions", apply = false)
             addSubproject("android-app") {
                 addPlugin("com.kroger.gradle.android-application-conventions")
+                addPlugin("org.jetbrains.kotlin.plugin.compose")
                 appendBuildFile(
                     """
                     android {

@@ -45,7 +45,6 @@ class DependencyTests {
         testProjectBuilder = rootProject(projectDir = testProjectDir) {
             versionCatalogSpec.versions.apply {
                 put("kgpCompileSdk", "\"32\"")
-                put("kgpAndroidxComposeCompiler", "\"1.3.2\"")
                 put("kgpAndroidxComposeBom", "\"2022-12-00\"")
                 put("kgpAndroidxHiltCompiler", "\"1.0.0\"")
                 put("kgpAndroidxRoom", "\"2.6.1\"")

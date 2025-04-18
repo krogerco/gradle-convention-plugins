@@ -38,6 +38,15 @@ internal class KgpVersions(private val catalog: VersionCatalog) {
     val kgpJdk: Int
         get() = getVersion("kgpJdk").toInt()
 
+    val kgpKotlinApiVersion: String?
+        get() = getOptionalVersion("kgpKotlinApiVersion")
+
+    val kgpKotlinLanguageVersion: String?
+        get() = getOptionalVersion("kgpKotlinLanguageVersion")
+
+    val kgpJvmTarget: Int
+        get() = (getOptionalVersion("kgpJvmTarget") ?: getVersion("kgpJdk")).toInt()
+
     val kgpCompileSdk: Int
         get() = getVersion("kgpCompileSdk").toInt()
 
@@ -48,9 +57,6 @@ internal class KgpVersions(private val catalog: VersionCatalog) {
         get() = catalog.findBundle("kgpCompose").orElseThrow {
             IllegalStateException("Missing \"kgpCompose\" bundle in Version Catalog")
         }
-
-    val kgpComposeCompiler: String
-        get() = getVersion("kgpAndroidxComposeCompiler")
 
     val kgpDagger: String
         get() = getVersion("kgpDagger")

@@ -46,7 +46,6 @@ class ConfigureComposeTest {
             versionCatalogSpec.apply {
                 versions.apply {
                     put("kgpAndroidxComposeBom", "\"2022.12.00\"")
-                    put("kgpAndroidxComposeCompiler", "\"1.4.7\"")
                     put("kgpCompileSdk", "\"32\"")
                     put("kgpDokka", "\"1.8.20\"")
                     put("kgpKotlin", "\"$KOTLIN_VERSION\"")
@@ -83,9 +82,6 @@ class ConfigureComposeTest {
 
     @Test
     fun `GIVEN compose autoconfigure disabled WHEN gradle configuration runs THEN compose related versions are not needed`() {
-        testProjectBuilder.versionCatalogSpec.versions.apply {
-            remove("kgpAndroidxComposeCompiler")
-        }
         testProjectBuilder.withProperties {
             put("kgp.android.autoconfigure.compose", "false")
         }
@@ -112,17 +108,6 @@ class ConfigureComposeTest {
             .output
 
         output.shouldContain("implementation(androidx.compose:compose-bom:2022.12.00)")
-    }
-
-    @Test
-    fun `GIVEN compose autoconfigure enabled WHEN compose compiler version missing THEN exception thrown`() {
-        testProjectBuilder.versionCatalogSpec.versions.remove("kgpAndroidxComposeCompiler")
-        testProjectBuilder.build()
-        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
-            .buildAndFail()
-            .output
-
-        output.shouldContain("No version found in version catalog with alias: kgpAndroidxComposeCompiler")
     }
 
     @Test

@@ -43,6 +43,9 @@ When using the convention plugins certain versions are expected to be in the ver
 
 The following versions are required in the version catalog:
 - **kgpJdk**: The JDK version to use when setting `jvmToolchain`.
+- **kgpJvmTarget**: Defaults to the kgpJdk version but can be overridden to set the JVM target version if different.
+- **kgpKotlinApiVersion**: The Kotlin API version to use. Defaults to the Kotlin Gradle Plugin version.
+- **kgpKotlinLanguageVersion**: The Kotlin language version to use. Defaults to the Kotlin Gradle Plugin version.
 
 The following versions are required in the version catalog when using Android convention plugins:
 - **kgpCompileSdk**: The SDK version the application compiles against.
@@ -315,7 +318,6 @@ Auto-configuration does the following:
 ### Version Catalog Requirements
 The following versions and bundle are expected in the Version Catalog when using Jetpack Compose auto-configuration:
 - **`kgpAndroidxComposeBom`:** [Jetpack Compose Bill of Materials](https://developer.android.com/jetpack/compose/bom) version to use for Jetpack Compose dependencies.
-- **`kgpAndroidxComposeCompiler`:** Version of the Jetpack Compose Compiler to use. The version specified should be compatible with the version of the Kotlin Compiler Plugin used according to the [Compatibility Map](https://developer.android.com/jetpack/androidx/releases/compose-kotlin).
 - **`kgpCompose`:** This Bundle is only required in the Version Catalog if the `kgp.android.autoconfigure.compose.dependencies` property is set to `bundle`. If it is then the `compose` bundle is added to the dependencies of the project.
 
 ### Properties
