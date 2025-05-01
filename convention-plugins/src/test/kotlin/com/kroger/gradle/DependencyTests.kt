@@ -54,6 +54,8 @@ class DependencyTests {
                 put("kgpKotlin", "\"$KOTLIN_VERSION\"")
                 put("kgpKotlinxSerialization", "\"1.0.0\"")
                 put("kgpJdk", "\"$JDK_VERSION\"")
+                put("kgpJunit4", "\"4.13.2\"")
+                put("kgpJunitBom", "\"5.12.0\"")
                 put("kgpMinSdk", "\"26\"")
                 put("kgpMoshi", "\"1.0.0\"")
             }
@@ -73,7 +75,7 @@ class DependencyTests {
 
                     afterEvaluate {
                         listOf("implementation", "debugImplementation", "androidTestImplementation", 
-                               "ksp", "kapt", "kaptTest", "kaptAndroidTest").forEach { configurationName ->
+                               "ksp", "kapt", "kaptTest", "kaptAndroidTest", "testImplementation", "testRuntimeOnly").forEach { configurationName ->
                             configurations.named(configurationName).configure {
                                 println("CONFIGURATION NAME: ${"$"}name")
                                 dependencies.forEach { println("\t${"$"}name(${"$"}{it.group}:${"$"}{it.name}:${"$"}{it.version})") }
@@ -372,6 +374,47 @@ class DependencyTests {
         output.shouldContainAll(
             "implementation(native-platform:deeplink:3.0.0",
             "ksp(native-platform:deeplink-processor:3.0.0",
+        )
+    }
+
+    @Test
+    fun `GIVEN junit5 called THEN expected dependencies added`() {
+        testProjectBuilder.configureSubproject("android-library-module") {
+            appendBuildFile("junit5()")
+        }
+        testProjectBuilder.build()
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "testImplementation(org.junit:junit-bom:5.12.0)",
+            "testImplementation(org.junit.jupiter:junit-jupiter:null)",
+            "testRuntimeOnly(org.junit.platform:junit-platform-launcher:null)",
+        )
+
+        output.shouldNotContainAny(
+            "testImplementation(junit:junit:4.13.2)",
+            "testRuntimeOnly(org.junit.vintage:junit-vintage-engine:null)",
+        )
+    }
+
+    @Test
+    fun `GIVEN junitVintage called THEN expected dependencies added`() {
+        testProjectBuilder.configureSubproject("android-library-module") {
+            appendBuildFile("junitVintage()")
+        }
+        testProjectBuilder.build()
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "testImplementation(junit:junit:4.13.2)",
+            "testImplementation(org.junit:junit-bom:5.12.0)",
+            "testImplementation(org.junit.jupiter:junit-jupiter:null)",
+            "testRuntimeOnly(org.junit.platform:junit-platform-launcher:null)",
+            "testRuntimeOnly(org.junit.vintage:junit-vintage-engine:null)",
         )
     }
 

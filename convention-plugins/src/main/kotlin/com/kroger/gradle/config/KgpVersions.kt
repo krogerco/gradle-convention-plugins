@@ -70,8 +70,8 @@ internal class KgpVersions(private val catalog: VersionCatalog) {
     val kgpJunit4: String
         get() = getVersion("kgpJunit4")
 
-    val kgpJunit5: String
-        get() = getVersion("kgpJunit5")
+    val kgpJunitBom: String
+        get() = getVersion("kgpJunitBom")
 
     val kgpKotlinxSerialization: String
         get() = getVersion("kgpKotlinxSerialization")
@@ -82,7 +82,7 @@ internal class KgpVersions(private val catalog: VersionCatalog) {
     val kgpMoshi: String
         get() = getVersion("kgpMoshi")
 
-    val kgpRoom: String
+    val kgpAndroidxRoom: String
         get() = getVersion("kgpAndroidxRoom")
 
     val kgpTargetSdk: Int

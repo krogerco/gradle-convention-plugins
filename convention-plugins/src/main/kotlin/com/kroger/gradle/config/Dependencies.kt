@@ -45,7 +45,7 @@ import java.io.File
 /**
  * Adds core library desugaring to the dependencies so newer Java APIs can be used on older
  * versions of Android.
- * This requires the Version Catalog to have an "androidDesugarJdkLibs" version.
+ * This requires the Version Catalog to have a "kgpAndroidDesugarJdkLibs" version.
  */
 public fun Project.coreLibraryDesugaring() {
     val coreLibraryDesugaringVersion = KgpProperties(project).kgpVersions.kgpAndroidDesugarJdkLibs
@@ -54,8 +54,8 @@ public fun Project.coreLibraryDesugaring() {
 
 /**
  * Adds hilt android and hilt android compiler KSP dependencies.
- * This requires the Version Catalog to have a "dagger" version.
- * An `androidxHiltCompiler` version is required when [androidxHiltCompiler] is true
+ * This requires the Version Catalog to have a "kgpDagger" version.
+ * A `kgpAndroidxHiltCompiler` version is required when [androidxHiltCompiler] is true
  * @param androidxHiltCompiler whether or not to also add the androidx hilt compiler
  */
 public fun Project.hiltKsp(androidxHiltCompiler: Boolean = false) {
@@ -81,8 +81,8 @@ public fun Project.hiltKsp(androidxHiltCompiler: Boolean = false) {
 
 /**
  * Adds hilt android and hilt android compiler KAPT dependencies.
- * This requires the Version Catalog to have a "dagger" version.
- * An `androidxHiltCompiler` version is required when [androidxHiltCompiler] is true
+ * This requires the Version Catalog to have a "kgpDagger" version.
+ * A `kgpAndroidxHiltCompiler` version is required when [androidxHiltCompiler] is true
  * @param androidxHiltCompiler whether or not to also add the androidx hilt compiler
  */
 @Deprecated(
@@ -120,7 +120,7 @@ public fun Project.hilt(
 
 /**
  * Adds dagger KSP dependencies and optionally dagger-android and dagger-android-support.
- * This requires the Version Catalog to have a "dagger" version.
+ * This requires the Version Catalog to have a "kgpDagger" version.
  * @param daggerAndroid whether or not to also add the dagger-android dependencies
  * @param daggerAndroidSupport whether or not to also add the dagger-android-support dependencies. When true
  * this also adds dagger-android dependencies
@@ -145,7 +145,7 @@ public fun Project.daggerKsp(daggerAndroid: Boolean = false, daggerAndroidSuppor
 
 /**
  * Adds dagger KAPT dependencies and optionally dagger-android and dagger-android-support.
- * This requires the Version Catalog to have a "dagger" version.
+ * This requires the Version Catalog to have a "kgpDagger" version.
  * @param daggerAndroid whether or not to also add the dagger-android dependencies
  * @param daggerAndroidSupport whether or not to also add the dagger-android-support dependencies. When true
  * this also adds dagger-android dependencies
@@ -179,7 +179,7 @@ public fun Project.dagger(daggerAndroid: Boolean = false, daggerAndroidSupport: 
 
 /**
  * Adds deep link dependencies and ksp processing.
- * This requires the Version Catalog to have a "deepLink" version.
+ * This requires the Version Catalog to have a "kgpDeepLink" version.
  * @param deepLinkDocFile Where to create the deep link report. Default is {buildDir}/doc/deeplinks.json.
  */
 public fun Project.deepLink(deepLinkDocFile: Provider<RegularFile>) {
@@ -200,7 +200,7 @@ public fun Project.deepLink(deepLinkDocFile: Provider<RegularFile>) {
 
 /**
  * Adds the org.jetbrains.kotlin.plugin.serialization plugin and optionally the json serialization dependency.
- * This requires the Version Catalog to have a "kotlinxSerialization" version.
+ * This requires the Version Catalog to have a "kgpKotlinxSerialization" version.
  * @param json when true adds json as a dependency.
  */
 public fun Project.kotlinxSerialization(json: Boolean = false) {
@@ -213,7 +213,7 @@ public fun Project.kotlinxSerialization(json: Boolean = false) {
 
 /**
  * Adds Moshi dependencies.
- * This requires the Version Catalog to have a "moshi" version.
+ * This requires the Version Catalog to have a "kgpMoshi" version.
  * @param codegen when true adds ksp processor to generate adapters
  * @param moshiAdapters when true adds the moshi-adapters dependency
  * @param moshiKotlinReflect when true allows use of moshi reflection
@@ -240,7 +240,7 @@ public fun Project.moshi(
 
 /**
  * Adds Room dependencies and kapt processor.
- * This requires the Version Catalog to have an "androidxRoom" version.
+ * This requires the Version Catalog to have a "kgpAndroidxRoom" version.
  * @param schemaDirectory where Room should generate schema json files for the database
  * @param commonExtension used to add [schemaDirectory] to androidTest source set if needed
  */
@@ -254,7 +254,7 @@ public fun Project.roomKapt(
     schemaDirectory: Provider<Directory>,
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
-    val roomVersion = KgpProperties(project).kgpVersions.kgpRoom
+    val roomVersion = KgpProperties(project).kgpVersions.kgpAndroidxRoom
     dependencies {
         add(Configurations.IMPLEMENTATION, "androidx.room:room-runtime:$roomVersion")
         add(Configurations.IMPLEMENTATION, "androidx.room:room-ktx:$roomVersion")
@@ -295,7 +295,7 @@ private fun Project.commonRoomConfig(
 
 /**
  * Adds Room dependencies and ksp processor.
- * This requires the Version Catalog to have an "androidxRoom" version.
+ * This requires the Version Catalog to have a "kgpAndroidxRoom" version.
  * @param schemaDirectoryPath where Room should generate schema json files for the database. Default is projectDir/schemas.
  * @param commonExtension used to add [schemaDirectoryPath] to androidTest source set if needed
  */
@@ -303,7 +303,7 @@ public fun Project.room(
     schemaDirectoryPath: Provider<String?> = provider { project.layout.projectDirectory.dir("schemas").asFile.absolutePath },
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
-    val roomVersion = KgpProperties(project).kgpVersions.kgpRoom
+    val roomVersion = KgpProperties(project).kgpVersions.kgpAndroidxRoom
     dependencies {
         add(Configurations.IMPLEMENTATION, "androidx.room:room-runtime:$roomVersion")
         add(Configurations.IMPLEMENTATION, "androidx.room:room-ktx:$roomVersion")
@@ -329,12 +329,13 @@ public fun Project.room(
 // region testing
 /**
  * Adds the required dependencies to use JUnit 5.
- * This requires the Version Catalog to have a `junit5` version.
+ * This requires the Version Catalog to have a `kgpJunitBom` version.
  */
 public fun Project.junit5() {
-    val junit5Version = KgpProperties(project).kgpVersions.kgpJunit5
+    val junitBom = KgpProperties(project).kgpVersions.kgpJunitBom
     dependencies {
-        add(Configurations.TEST_IMPLEMENTATION, platform("org.junit:junit-bom:$junit5Version"))
+        add(Configurations.TEST_IMPLEMENTATION, platform("org.junit:junit-bom:$junitBom"))
+        add(Configurations.TEST_RUNTIME_ONLY, "org.junit.platform:junit-platform-launcher")
         add(Configurations.TEST_IMPLEMENTATION, "org.junit.jupiter:junit-jupiter")
     }
 }
@@ -342,7 +343,7 @@ public fun Project.junit5() {
 /**
  * Adds the required dependencies for JUnit 5. It also enables the Vintage Engine
  * and support for JUnit 4.
- * This requires the Version Catalog to have `junit5` and `junit4` versions.
+ * This requires the Version Catalog to have `kgpJunitBom` and `kgpJunit4` versions.
  */
 public fun Project.junitVintage() {
     junit5()

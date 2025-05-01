@@ -1,7 +1,7 @@
 # Gradle Convention Plugins
 
 A collection of convention plugins to consistently configure Android applications and libraries.
-The plugins require Gradle 8.4+ and Android Gradle Plugin 8.3+ for Android projects.
+The plugins require Gradle 8.11.1+ and Android Gradle Plugin 8.9.1+ for Android projects.
 
 - [Installation](#installation)
   - [Version Catalog Requirements](#version-catalog-requirements)
@@ -337,7 +337,7 @@ A couple utility functions exist to help configure `JUnit` dependencies:
 ### Version Catalog Requirements
 The following versions are expected in the Version Catalog when using the `junit` utility functions:
 - **`kgpJunit4`:** The version of `junit4`. This is only required if `junitVintage()` is used.
-- **`kgpJunit5`:** The version of `junit5`.
+- **`kgpJunitBom`:** What BOM version to use for JUnit 5 dependencies.
 
 ## Kotlinx Serialization
 The following utility function exists to help configure `Kotlinx Serialization`:
