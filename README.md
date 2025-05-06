@@ -167,9 +167,10 @@ This plugin is automatically applied when using either the Published Android Lib
 These default values can be changed by using further configuration in the `build.gradle.kts` file of the project or the `gradle.properties` file of the project as shown in the [documentation](https://vanniktech.github.io/gradle-maven-publish-plugin/other/#github-packages-example).
 
 The following additional properties can be added to the `gradle.properties` file:
+- **kgp.repository.credentials.env.password:** the name of the environment variable containing the repository password. Default is `ARTIFACTORY_PASSWORD`.
+- **kgp.repository.credentials.env.username:** the name of the environment variable containing the repository username. Default is `ARTIFACTORY_USERNAME`.
 - **kgp.repository.name:** the name of the repository as it will appear in generated Gradle tasks. Default is `Artifactory`.
 - **kgp.repository.url:** the `URL` of the repository to publish to. Default is null.
-
 
 ### Standalone Usage
 

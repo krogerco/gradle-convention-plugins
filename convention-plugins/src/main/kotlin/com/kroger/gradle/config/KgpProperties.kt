@@ -32,31 +32,31 @@ internal class KgpProperties private constructor(private val project: Project) {
      * Whether to auto-apply the Dependency Maintenance plugin to the root project. Default is true.
      */
     val autoApplyDependencyManagement: Boolean
-        get() = project.findOptionalBooleanProperty("kgp.plugins.autoapply.dependencymanagement") ?: true
+        get() = project.findOptionalBooleanProperty("kgp.plugins.autoapply.dependencymanagement") != false
 
     /**
      * Whether to auto-apply the Dokka plugin to supported projects. Default is true.
      */
     val autoApplyDokka: Boolean
-        get() = project.findOptionalBooleanProperty("kgp.plugins.autoapply.dokka") ?: true
+        get() = project.findOptionalBooleanProperty("kgp.plugins.autoapply.dokka") != false
 
     /**
      * Whether to auto-apply the Kotlinter plugin to supported projects. Default is true.
      */
     val autoApplyKotlinter: Boolean
-        get() = project.findOptionalBooleanProperty("kgp.plugins.autoapply.kotlinter") ?: true
+        get() = project.findOptionalBooleanProperty("kgp.plugins.autoapply.kotlinter") != false
 
     /**
      * Whether to auto-apply the Kover plugin to supported projects. Default is true.
      */
     val autoApplyKover: Boolean
-        get() = project.findOptionalBooleanProperty("kgp.plugins.autoapply.kover") ?: true
+        get() = project.findOptionalBooleanProperty("kgp.plugins.autoapply.kover") != false
 
     /**
      * Whether to auto-configure compose in Android related projects
      */
     val autoConfigureCompose: Boolean
-        get() = project.findOptionalBooleanProperty("kgp.android.autoconfigure.compose") ?: true
+        get() = project.findOptionalBooleanProperty("kgp.android.autoconfigure.compose") != false
 
     /**
      * Whether to auto-configure compose dependencies. Default is none.
@@ -75,25 +75,25 @@ internal class KgpProperties private constructor(private val project: Project) {
      * Whether to auto-configure core library desugaring to use newer Java APIs on older versions of Android. Default is false.
      */
     val autoConfigureCoreLibraryDesugaring: Boolean
-        get() = project.findOptionalBooleanProperty("kgp.android.autoconfigure.corelibrarydesugaring") ?: false
+        get() = project.findOptionalBooleanProperty("kgp.android.autoconfigure.corelibrarydesugaring") == true
 
     /**
      * Whether to auto-configure each subproject's group and version. Default is true.
      */
     val autoConfigurePublishingProperties: Boolean
-        get() = project.findOptionalBooleanProperty("kgp.autoconfigure.publishingproperties") ?: true
+        get() = project.findOptionalBooleanProperty("kgp.autoconfigure.publishingproperties") != false
 
     /**
      * Whether to auto-configure Hilt when the Android Application Convention plugin is applied. Default is true.
      */
     val autoConfigureHiltApplication: Boolean
-        get() = project.findOptionalBooleanProperty("kgp.android.autoconfigure.hilt.application") ?: true
+        get() = project.findOptionalBooleanProperty("kgp.android.autoconfigure.hilt.application") != false
 
     /**
      * Whether to auto-configure Hilt when the Android Library Convention plugin is applied. Default is false.
      */
     val autoConfigureHiltLibrary: Boolean
-        get() = project.findOptionalBooleanProperty("kgp.android.autoconfigure.hilt.library") ?: false
+        get() = project.findOptionalBooleanProperty("kgp.android.autoconfigure.hilt.library") == true
 
     /**
      * Versions loaded from the version catalog that are used in the various plugins.
@@ -107,10 +107,22 @@ internal class KgpProperties private constructor(private val project: Project) {
     }
 
     /**
-     * The name of the repository used by default for publishing tasks.
+     * The name of the environment variable containing the repository password. Default is ARTIFACTORY_PASSWORD.
      */
-    val repositoryName: String?
-        get() = project.findOptionalStringProperty("kgp.repository.name")
+    val repositoryPasswordEnvironmentVariable: String
+        get() = project.findOptionalStringProperty("kgp.repository.credentials.env.password") ?: "ARTIFACTORY_PASSWORD"
+
+    /**
+     * The name of the environment variable containing the repository username. Default is ARTIFACTORY_USERNAME.
+     */
+    val repositoryUsernameEnvironmentVariable: String
+        get() = project.findOptionalStringProperty("kgp.repository.credentials.env.username") ?: "ARTIFACTORY_USERNAME"
+
+    /**
+     * The name of the repository used by default for publishing tasks. Default is Artifactory.
+     */
+    val repositoryName: String
+        get() = project.findOptionalStringProperty("kgp.repository.name") ?: "Artifactory"
 
     /**
      * The url of the repository used by default for publishing tasks.

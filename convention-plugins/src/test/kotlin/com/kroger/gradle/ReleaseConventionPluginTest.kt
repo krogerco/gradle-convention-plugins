@@ -78,7 +78,7 @@ class ReleaseConventionPluginTest {
     }
 
     @Test
-    fun `GIVEN release plugin with no repo settings THEN no artifactory publish task exists`() {
+    fun `GIVEN release plugin WHEN no repo settings supplied THEN no artifactory publish task exists`() {
         testProjectBuilder.build()
         val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
             .build()
@@ -96,14 +96,10 @@ class ReleaseConventionPluginTest {
     }
 
     @Test
-    fun `GIVEN release plugin WHEN properties set THEN property values applied correctly`() {
+    fun `GIVEN release plugin WHEN default credential properties used THEN property values applied correctly`() {
         testProjectBuilder.configureSubproject("kotlin-module") {
             withProperties {
-                put("kgp.repository.name", "fakename")
                 put("kgp.repository.url", "https://fakeurl")
-                put("GROUP", "com.kroger.override")
-                put("POM_ARTIFACT_ID", "override-module")
-                put("VERSION_NAME", "1.0.0")
             }
         }
 
@@ -119,12 +115,47 @@ class ReleaseConventionPluginTest {
             .output
 
         output.shouldContainAll(
+            "publishMavenPublicationToArtifactoryRepository",
+            "REPOSITORY COUNT: 1",
+            "REPOSITORY NAME: Artifactory",
+            "REPOSITORY URL: https://fakeurl",
+            "REPOSITORY USERNAME: fakeusername",
+            "REPOSITORY PASSWORD: fakepassword",
+        )
+    }
+
+    @Test
+    fun `GIVEN release plugin WHEN properties set THEN property values applied correctly`() {
+        testProjectBuilder.configureSubproject("kotlin-module") {
+            withProperties {
+                put("kgp.repository.name", "fakename")
+                put("kgp.repository.credentials.env.password", "CUSTOM_PASSWORD")
+                put("kgp.repository.credentials.env.username", "CUSTOM_USERNAME")
+                put("kgp.repository.url", "https://fakeurl")
+                put("GROUP", "com.kroger.override")
+                put("POM_ARTIFACT_ID", "override-module")
+                put("VERSION_NAME", "1.0.0")
+            }
+        }
+
+        testProjectBuilder.build()
+        val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
+            .withEnvironment(
+                mapOf(
+                    "CUSTOM_USERNAME" to "customfakeusername",
+                    "CUSTOM_PASSWORD" to "customfakepassword",
+                ),
+            )
+            .build()
+            .output
+
+        output.shouldContainAll(
             "publishMavenPublicationToFakenameRepository",
             "REPOSITORY COUNT: 1",
             "REPOSITORY NAME: fakename",
             "REPOSITORY URL: https://fakeurl",
-            "REPOSITORY USERNAME: fakeusername",
-            "REPOSITORY PASSWORD: fakepassword",
+            "REPOSITORY USERNAME: customfakeusername",
+            "REPOSITORY PASSWORD: customfakepassword",
             "PUBLICATION ARTIFACT ID: override-module",
             "PUBLICATION GROUP ID: com.kroger.override",
             "PUBLICATION VERSION: 1.0.0",
