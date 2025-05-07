@@ -163,6 +163,34 @@ class ReleaseConventionPluginTest {
     }
 
     @Test
+    fun `GIVEN release plugin WHEN credentials missing value THEN no value available error occurs`() {
+        testProjectBuilder.configureSubproject("kotlin-module") {
+            withProperties {
+                put("kgp.repository.name", "fakename")
+                put("kgp.repository.credentials.env.password", "CUSTOM_PASSWORD")
+                put("kgp.repository.credentials.env.username", "CUSTOM_USERNAME")
+                put("kgp.repository.url", "https://fakeurl")
+                put("GROUP", "com.kroger.override")
+                put("POM_ARTIFACT_ID", "override-module")
+                put("VERSION_NAME", "1.0.0")
+            }
+        }
+
+        testProjectBuilder.build()
+        val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
+            .buildAndFail()
+            .output
+
+        output.shouldContainAll(
+            """
+                Cannot query the value of this provider because it has no value available.
+                  The value of this provider is derived from:
+                    - environment variable 'CUSTOM_USERNAME'
+            """.trimIndent(),
+        )
+    }
+
+    @Test
     fun `GIVEN release plugin WHEN subproject contains repository definition THEN properties not used`() {
         testProjectBuilder.configureSubproject("kotlin-module") {
             appendBuildFile(

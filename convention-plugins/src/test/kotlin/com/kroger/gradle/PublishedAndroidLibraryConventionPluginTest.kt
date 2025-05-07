@@ -86,6 +86,12 @@ class PublishedAndroidLibraryConventionPluginTest {
         testProjectBuilder.build()
 
         val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .withEnvironment(
+                mapOf(
+                    "ARTIFACTORY_USERNAME" to "fakeusername",
+                    "ARTIFACTORY_PASSWORD" to "fakepassword",
+                ),
+            )
             .build()
             .output
 
