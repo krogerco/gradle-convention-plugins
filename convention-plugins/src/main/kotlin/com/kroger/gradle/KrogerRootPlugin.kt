@@ -30,8 +30,7 @@ import com.kroger.gradle.config.buildVersion
 import com.kroger.gradle.config.configureDokka
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.Delete
-import org.gradle.kotlin.dsl.register
+import org.gradle.api.plugins.BasePlugin
 import org.gradle.util.GradleVersion
 
 /**
@@ -48,6 +47,8 @@ public class KrogerRootPlugin : Plugin<Project> {
         }
 
         with(target) {
+            pluginManager.apply(BasePlugin::class.java)
+
             val kgpProperties = KgpProperties(this)
             if (kgpProperties.autoApplyDependencyManagement) {
                 pluginManager.apply(DependencyConventionPlugin::class.java)
@@ -63,11 +64,6 @@ public class KrogerRootPlugin : Plugin<Project> {
                     group = "com.kroger.${rootProject.name}"
                     version = buildVersion.getOrElse("0.0.1")
                 }
-            }
-
-            tasks.register<Delete>("clean") {
-                group = "build"
-                delete(rootProject.layout.buildDirectory)
             }
         }
     }

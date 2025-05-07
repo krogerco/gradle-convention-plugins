@@ -66,6 +66,12 @@ class PublishedKotlinLibraryConventionPluginTest {
         testProjectBuilder.build()
 
         val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
+            .withEnvironment(
+                mapOf(
+                    "ARTIFACTORY_USERNAME" to "fakeusername",
+                    "ARTIFACTORY_PASSWORD" to "fakepassword",
+                ),
+            )
             .build()
             .output
 
