@@ -128,6 +128,7 @@ class PublishedKotlinLibraryConventionPluginTest {
         output.shouldContainAll(
             "Kotlin API Version: null",
             "Kotlin Language Version: null",
+            "Java Release: $JDK_VERSION",
             "Java Source Compatibility: $JDK_VERSION",
             "Java Target Compatibility: $JDK_VERSION",
         )
@@ -154,8 +155,9 @@ class PublishedKotlinLibraryConventionPluginTest {
         output.shouldContainAll(
             "Kotlin API Version: $kotlinVersion",
             "Kotlin Language Version: $kotlinVersion",
-            "Java Source Compatibility: $jvmTarget",
-            "Java Target Compatibility: $jvmTarget",
+            "Java Release: $jvmTarget",
+            "Java Source Compatibility: $JDK_VERSION",
+            "Java Target Compatibility: $JDK_VERSION",
         )
     }
 
@@ -168,6 +170,10 @@ class PublishedKotlinLibraryConventionPluginTest {
                             println("Kotlin API Version: ${"$"}{apiVersion.orNull?.version}")
                             println("Kotlin Language Version: ${"$"}{languageVersion.orNull?.version}")
                         }
+                    }
+
+                    tasks.withType<JavaCompile>().configureEach {
+                        println("Java Release: ${"$"}{options.release.get()}")
                     }
                     java {
                         println("Java Source Compatibility: ${"$"}{sourceCompatibility}")
