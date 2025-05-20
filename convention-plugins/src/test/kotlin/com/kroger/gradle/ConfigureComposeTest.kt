@@ -30,6 +30,7 @@ import com.kroger.gradle.util.gradleRunner
 import com.kroger.gradle.util.rootProject
 import com.kroger.gradle.util.shouldContainAll
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -86,8 +87,11 @@ class ConfigureComposeTest {
             put("kgp.android.autoconfigure.compose", "false")
         }
         testProjectBuilder.build()
-        gradleRunner(testProjectDir, ":android-library-module:tasks")
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
             .build()
+            .output
+
+        output.shouldNotContain("implementation(androidx.compose:compose-bom:2022.12.00)")
     }
 
     @Test

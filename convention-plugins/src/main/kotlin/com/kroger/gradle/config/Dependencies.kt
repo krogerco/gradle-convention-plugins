@@ -359,7 +359,7 @@ public fun Project.junitVintage() {
 /**
  * Imports the compose BOM. This requires the Version Catalog to have an `kgpAndroidxComposeBom` version.
  */
-internal fun Project.composeBom() {
+public fun Project.composeBom() {
     val composeBomVersion = KgpProperties(project).kgpVersions.kgpComposeBom
     dependencies {
         val composeBom = platform("androidx.compose:compose-bom:$composeBomVersion")

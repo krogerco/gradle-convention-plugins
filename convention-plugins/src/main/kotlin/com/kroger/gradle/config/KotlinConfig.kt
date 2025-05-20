@@ -45,7 +45,6 @@ internal fun Project.configureKotlinAndroid(
 ) {
     val kgpVersions = kgpProperties.kgpVersions
     configureKotlin(kgpVersions, explicitApiMode)
-    composeBom()
     with(commonExtension) {
         compileSdk = kgpVersions.kgpCompileSdk
 
@@ -113,7 +112,7 @@ public fun Project.configureCompose(
     val kgpProperties = KgpProperties(this)
     val kgpVersions = kgpProperties.kgpVersions
     commonExtension.buildFeatures.compose = true
-
+    composeBom()
     dependencies.apply {
         composeBasic()
         logger.info("autoconfigureComposeSetting = ${kgpProperties.autoConfigureComposeDependencies}")
