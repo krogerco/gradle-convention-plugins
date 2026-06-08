@@ -5,6 +5,7 @@ androidxLintGradle = "1.0.0-alpha03"
 androidxRoom = "2.7.0"
 catalogVersionsPlugin = "0.8.5"
 dependencyAnalysisPlugin = "2.13.3"
+dependencyGuard = "0.5.0"
 foojay = "0.9.0"
 dokka = "2.0.0"
 gradleMavenPublishPlugin = "0.31.0"
@@ -32,6 +33,7 @@ gradlePlugins-android = { module = "com.android.tools.build:gradle", version.ref
 gradlePlugins-catalogVersions = { module = "nl.littlerobots.version-catalog-update:nl.littlerobots.version-catalog-update.gradle.plugin", version.ref = "catalogVersionsPlugin" }
 gradlePlugins-compose = { module = "org.jetbrains.kotlin.plugin.compose:org.jetbrains.kotlin.plugin.compose.gradle.plugin", version.ref = "kotlin" }
 gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin"}
+gradlePlugins-dependencyGuard = { module = "com.dropbox.dependency-guard:dependency-guard", version.ref = "dependencyGuard" }
 gradlePlugins-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 gradlePlugins-foojayResolver = { module = "org.gradle.toolchains:foojay-resolver", version.ref = "foojay" }
 gradlePlugins-gradleVersions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "gradleVersionsPlugin" }

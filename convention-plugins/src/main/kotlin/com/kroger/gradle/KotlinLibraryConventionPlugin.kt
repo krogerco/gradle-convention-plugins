@@ -24,6 +24,7 @@
 package com.kroger.gradle
 
 import com.kroger.gradle.config.KgpProperties
+import com.kroger.gradle.config.configureDependencyGuard
 import com.kroger.gradle.config.configureDokka
 import com.kroger.gradle.config.configureKotlin
 import com.kroger.gradle.config.configureKover
@@ -48,6 +49,7 @@ public class KotlinLibraryConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply(JavaLibraryPlugin::class.java)
                 apply(KotlinPluginWrapper::class.java)
+                configureDependencyGuard(kgpProperties.autoApplyDependencyGuard)
                 configureDokka(kgpProperties.autoApplyDokka)
                 configureKover(kgpProperties.autoApplyKover)
                 if (kgpProperties.autoApplyKotlinter) {

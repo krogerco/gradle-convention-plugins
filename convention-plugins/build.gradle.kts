@@ -114,6 +114,7 @@ dependencies {
     compileOnly(libs.gradlePlugins.androidJunit5)
     compileOnly(libs.gradlePlugins.compose)
     compileOnly(libs.gradlePlugins.dependencyAnalysis)
+    compileOnly(libs.gradlePlugins.dependencyGuard)
     compileOnly(libs.gradlePlugins.dokka)
     compileOnly(libs.gradlePlugins.gradleMavenPublishPlugin)
     compileOnly(libs.gradlePlugins.gradleVersions)
