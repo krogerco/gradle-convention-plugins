@@ -39,37 +39,27 @@ import org.jmailen.gradle.kotlinter.KotlinterPlugin
 /**
  * When [isDependencyGuardEnabled] is true, adds the DependencyGuard plugin.
  */
-internal fun Project.configureDependencyGuard(isDependencyGuardEnabled: Boolean) {
+internal fun Project.configureDependencyGuard(isDependencyGuardEnabled: Boolean, isAndroidProject: Boolean = false) {
     if (isDependencyGuardEnabled) {
-        pluginManager.apply("com.dropbox.dependency-guard")
-        pluginManager.withPlugin("com.dropbox.dependency-guard") {
-            extensions.configure<com.dropbox.gradle.plugins.dependencyguard.DependencyGuardPluginExtension>("dependencyGuard") {
-                configuration("runtimeClasspath") {
-                    allowedFilter = {
-                        !it.contains("junit")
-                    }
-                }
-                configuration("compileClasspath")
-            }
+        val runtimeClassPath = if (isAndroidProject) {
+            "releaseRuntimeClasspath"
+        } else {
+            "runtimeClasspath"
         }
-    }
-}
-
-/**
- *
- * When [isDependencyGuardEnabled] is true, adds the DependencyGuard plugin.
- */
-internal fun Project.configureDependencyGuardAndroid(isDependencyGuardEnabled: Boolean) {
-    if (isDependencyGuardEnabled) {
+        val compileClasspath = if (isAndroidProject) {
+            "releaseCompileClasspath"
+        } else {
+            "compileClasspath"
+        }
         pluginManager.apply("com.dropbox.dependency-guard")
         pluginManager.withPlugin("com.dropbox.dependency-guard") {
             extensions.configure<com.dropbox.gradle.plugins.dependencyguard.DependencyGuardPluginExtension>("dependencyGuard") {
-                configuration("releaseRuntimeClasspath") {
+                configuration(runtimeClassPath) {
                     allowedFilter = {
                         !it.contains("junit")
                     }
                 }
-                configuration("releaseCompileClasspath")
+                configuration(compileClasspath)
             }
         }
     }
