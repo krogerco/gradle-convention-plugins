@@ -17,6 +17,8 @@ The plugins require Gradle 8.11.1+ and Android Gradle Plugin 8.9.1+ for Android 
 - [Configuration](#configuration)
   - [Dagger](#dagger)
   - [Deep Links](#deep-links)
+  - [DependencyGuard](#dependencyguard)
+  - [Dokka V2 Configuration](#dokka-v2-configuration)
   - [Hilt](#hilt)
   - [Java API Desugaring](#java-api-desugaring)
   - [Jetpack Compose](#jetpack-compose)
@@ -59,6 +61,7 @@ The following versions are required in the version catalog when using Android co
 Some convention plugins auto-apply other plugins to better support common use cases. However, it is possible the plugins are not wanted on certain projects. When present in the `gradle.properties` file, the properties below can be used to prevent plugins from being auto-applied on supported projects:
 
 ```
+kgp.plugins.autoapply.dependencyguard=false
 kgp.plugins.autoapply.dependencymanagement=false
 kgp.plugins.autoapply.dokka=false
 kgp.plugins.autoapply.kotlinter=false
@@ -72,7 +75,8 @@ A plugin that only gets applied to the root project in a multi-project build. It
     - **group:** `com.kroger.{rootProject.name}`
     - **version:** set to the value of the environment variable `BUILD_VERSION` if it exists, otherwise `0.0.1`
 - Configures the [Kotlinter](#kotlinter) plugin.
-- Configures the [Dependency Management](#dependency-management) plugin. 
+- Configures the [Dependency Management](#dependency-management) plugin.
+- Automatically configures Dokka (see [Dokka V2](#dokka-v2-configuration) for details). 
 
 ### Usage
 Add the following plugin to the root project `build.gradle.kts` file:
@@ -268,6 +272,27 @@ The following utility functions exist to help configure `Deep Links`:
 The following versions are expected in the Version Catalog when using the `Deep Links` utility functions:
 - **`kgpDeepLink`:** The version to use for deep link dependencies.
 
+## DependencyGuard
+[DependencyGuard](https://github.com/dropbox/dependency-guard) is automatically applied to Kotlin and Android library projects to help track changes to project dependencies. The plugin generates baseline files that can be checked into version control to monitor dependency changes over time.
+
+**Configuration for Kotlin Libraries:**
+- Monitors `runtimeClasspath` and `compileClasspath` configurations
+- Filters out JUnit dependencies from runtime classpath monitoring
+
+**Configuration for Android Libraries:**
+- Monitors `releaseRuntimeClasspath` and `releaseCompileClasspath` configurations
+- Filters out JUnit dependencies from release runtime classpath monitoring
+
+### Available Tasks
+- **`dependencyGuard`:** Validates that dependencies match the baseline files
+- **`dependencyGuardBaseline`:** Generates or updates the baseline files
+
+### Disabling DependencyGuard
+To disable DependencyGuard on a project, add the following to `gradle.properties`:
+```properties
+kgp.plugins.autoapply.dependencyguard=false
+```
+
 ## Hilt
 By default when the [Android Application](#android-application) plugin is applied hilt will be auto-configured on the project using `hilt()`.
 
@@ -321,7 +346,7 @@ The following versions and bundle are expected in the Version Catalog when using
 - **`kgpAndroidxComposeBom`:** [Jetpack Compose Bill of Materials](https://developer.android.com/jetpack/compose/bom) version to use for Jetpack Compose dependencies.
 - **`kgpCompose`:** This Bundle is only required in the Version Catalog if the `kgp.android.autoconfigure.compose.dependencies` property is set to `bundle`. If it is then the `compose` bundle is added to the dependencies of the project.
 
-### Properties
+### Prop
 The following properties are used in the `gradle.properties` file of projects to further control how auto-configuration is applied:
 - **`kgp.android.autoconfigure.compose`:** if true then Jetpack Compose will be auto-configured on supported projects. Default is true.
 - **`kgp.android.autoconfigure.compose.dependencies`:** controls what additional compose dependencies are added by default to projects based on the values below.
@@ -370,3 +395,58 @@ The following utility functions exist to help configure `Room`:
 ### Version Catalog Requirements
 The following versions are expected in the Version Catalog when using the `room` utility functions:
 - **`kgpAndroidxRoom`:** The version to use for Room dependencies.
+
+## Dokka V2 Configuration
+When Dokka is enabled (which is the default), the convention plugins automatically configure Dokka V2 using the official DSL API. The following configuration is applied:
+
+**Offline Mode:** Enabled by default. Dokka will not fetch external documentation links (Kotlin stdlib, JDK, Android SDK, etc.) over the network during documentation generation. This speeds up builds but makes external library references non-clickable in generated documentation.
+
+**Suppress Obvious Functions:** Enabled by default. Excludes obvious inherited functions like `equals()`, `hashCode()`, and `toString()` from generated documentation.
+
+**Module Information:** Automatically set to use the project's name and version.
+
+The configuration uses the official Dokka V2 DSL:
+```kotlin
+dokka {
+    moduleName.set(project.name)
+    moduleVersion.set(project.version.toString())
+
+    dokkaPublications.named("html") {
+        offlineMode.set(true)
+        suppressObviousFunctions.set(true)
+    }
+}
+```
+
+### Multi-Module Documentation Aggregation
+When the root plugin is applied, it automatically configures Dokka to aggregate documentation from all subprojects that have the Dokka plugin enabled. This creates a unified documentation site in the root project that includes all modules.
+
+The aggregation is configured using project dependencies per the [official Dokka V2 documentation](https://kotlinlang.org/docs/dokka-gradle.html#aggregate-subprojects):
+- Child projects with Dokka applied are automatically discovered during project evaluation
+- Each child project is added as a `dokka` dependency to the root project: `dependencies { dokka(project(":child")) }`
+- Root Dokka tasks depend on child Dokka tasks to ensure proper build ordering
+- The root project's generated documentation includes links to all child module documentation
+
+To generate aggregated documentation, run:
+```bash
+./gradlew dokkaGenerate
+```
+
+The aggregated HTML documentation will be available in `build/dokka/html/index.html` at the root project level.
+
+### Customizing Dokka Configuration
+To override these defaults, configure Dokka in your `build.gradle.kts`:
+
+```kotlin
+import org.jetbrains.dokka.gradle.DokkaExtension
+
+configure<DokkaExtension> {
+    dokkaPublications.named("html") {
+        // Enable external documentation links
+        offlineMode.set(false)
+
+        // Include obvious functions
+        suppressObviousFunctions.set(false)
+    }
+}
+```

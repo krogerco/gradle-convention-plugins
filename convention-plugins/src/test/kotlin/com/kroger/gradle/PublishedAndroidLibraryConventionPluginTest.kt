@@ -98,7 +98,7 @@ class PublishedAndroidLibraryConventionPluginTest {
         output.shouldContainAll(
             // default tasks
             "assemble - ",
-            "dokkaHtml - ",
+            "dokkaGenerateHtml - ",
             "installDebugAndroidTest - ",
             "koverHtmlReportDebug",
             "lintKotlin - ",
@@ -220,6 +220,35 @@ class PublishedAndroidLibraryConventionPluginTest {
         )
     }
 
+    @Test
+    fun `WHEN published android library plugin applied THEN dokka is configured with offline mode`() {
+        testProjectBuilder.configureSubproject("android-library-module") {
+            appendBuildFile(
+                """
+                afterEvaluate {
+                    val dokkaExt = extensions.getByName("dokka") as org.jetbrains.dokka.gradle.DokkaExtension
+                    dokkaExt.dokkaPublications.named("html") {
+                        println("Dokka Offline Mode: ${"$"}{offlineMode.get()}")
+                        println("Dokka Module Name: ${"$"}{dokkaExt.moduleName.get()}")
+                        println("Dokka Suppress Obvious: ${"$"}{suppressObviousFunctions.get()}")
+                    }
+                }
+                """.trimIndent(),
+            )
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "Dokka Offline Mode: true",
+            "Dokka Module Name: android-library-module",
+            "Dokka Suppress Obvious: true",
+        )
+    }
+
     private fun TestProjectBuilder.printJavaAndKotlinVersions() {
         appendBuildFile(
             """
@@ -236,7 +265,7 @@ class PublishedAndroidLibraryConventionPluginTest {
                             println("Java Target Compatibility: ${"$"}{targetCompatibility}")
                         }
                     }
-                }    
+                }
             """.trimIndent(),
         )
     }

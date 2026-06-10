@@ -31,7 +31,9 @@ import com.kroger.gradle.config.configureDokka
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.BasePlugin
+import org.gradle.kotlin.dsl.withType
 import org.gradle.util.GradleVersion
+import org.jetbrains.dokka.gradle.tasks.DokkaGenerateTask
 
 /**
  * Apply common checks and plugins. This should only be applied on the root project.
@@ -58,6 +60,43 @@ public class KrogerRootPlugin : Plugin<Project> {
                 applyAndConfigureKotlinter(this)
             }
             configureDokka(kgpProperties.autoApplyDokka)
+
+            // Configure multi-module Dokka aggregation
+            if (kgpProperties.autoApplyDokka && subprojects.isNotEmpty()) {
+                // Use gradle.projectsEvaluated to ensure all subprojects have been configured
+                // before setting up Dokka aggregation
+                gradle.projectsEvaluated {
+                    // Collect all subprojects that have Dokka applied
+                    val dokkaProjects = subprojects.filter { subproject ->
+                        val hasDokka = subproject.pluginManager.hasPlugin("org.jetbrains.dokka")
+                        logger.lifecycle("Dokka aggregation check: ${subproject.path} - hasPlugin: $hasDokka")
+                        if (hasDokka) {
+                            logger.lifecycle("Adding ${subproject.path} to dokka aggregation")
+                        }
+                        hasDokka
+                    }
+
+                    // Configure the root Dokka to aggregate all child projects
+                    if (dokkaProjects.isNotEmpty()) {
+                        pluginManager.withPlugin("org.jetbrains.dokka") {
+                            // In Dokka V2, aggregation uses project dependencies on the dokka configuration
+                            // See: https://kotlinlang.org/docs/dokka-gradle.html#aggregate-subprojects
+                            dokkaProjects.forEach { childProject ->
+                                dependencies.add("dokka", project(childProject.path))
+                            }
+
+                            // Make the root dokkaGenerate tasks depend on all child dokkaGenerate tasks
+                            // This ensures child docs are generated before parent aggregates them
+                            tasks.withType<DokkaGenerateTask>().configureEach {
+                                val childDokkaGenerateTasks = dokkaProjects.flatMap { childProject ->
+                                    childProject.tasks.withType<DokkaGenerateTask>()
+                                }
+                                dependsOn(childDokkaGenerateTasks)
+                            }
+                        }
+                    }
+                }
+            }
 
             if (kgpProperties.autoConfigurePublishingProperties) {
                 subprojects {

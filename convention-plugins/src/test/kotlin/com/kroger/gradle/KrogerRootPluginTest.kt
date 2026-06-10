@@ -31,7 +31,6 @@ import com.kroger.gradle.util.rootProject
 import com.kroger.gradle.util.shouldContainAll
 import com.kroger.gradle.util.shouldNotContainAny
 import io.kotest.matchers.string.shouldContain
-import io.kotest.matchers.string.shouldNotContain
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -67,12 +66,7 @@ class KrogerRootPluginTest {
             // tasks from Dependency Management
             "buildHealth - ",
             // tasks from dokka
-            "dokkaHtml",
-        )
-
-        // single module project should not contain dokka multi module task
-        output.shouldNotContain(
-            "dokkaHtmlMultiModule",
+            "dokkaGenerateHtml",
         )
     }
 
@@ -98,7 +92,7 @@ class KrogerRootPluginTest {
             // Dependency Management tasks do not exist
             "buildHealth - ",
             // dokka tasks do not exist
-            "dokkaHtml",
+            "dokkaGenerateHtml",
         )
     }
 
@@ -114,8 +108,9 @@ class KrogerRootPluginTest {
             .build()
             .output
 
+        // Dokka V2 multi-module aggregation uses logLink tasks
         output.shouldContain(
-            "dokkaHtmlMultiModule",
+            "logLinkDokkaGeneratePublicationHtml",
         )
     }
 

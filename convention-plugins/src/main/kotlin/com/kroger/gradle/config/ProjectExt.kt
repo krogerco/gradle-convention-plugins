@@ -30,9 +30,8 @@ import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.withType
+import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.dokka.gradle.DokkaPlugin
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jmailen.gradle.kotlinter.KotlinterPlugin
 
 // region plugin configuration
@@ -76,15 +75,39 @@ internal fun Project.configureDependencyGuardAndroid(isDependencyGuardEnabled: B
 }
 
 /**
- * When [isDokkaEnabled] is true, adds the Dokka plugin.
+ * When [isDokkaEnabled] is true, adds the Dokka plugin and configures it with offline mode.
  * @param isAndroidProject when true adds the android documentation plugin dependency
  */
 internal fun Project.configureDokka(isDokkaEnabled: Boolean, isAndroidProject: Boolean = false) {
     if (isDokkaEnabled) {
+        // Enable Dokka V2 mode if not already set by the user
+        if (!hasProperty("org.jetbrains.dokka.experimental.gradle.pluginMode")) {
+            extensions.extraProperties.set("org.jetbrains.dokka.experimental.gradle.pluginMode", "V2Enabled")
+            extensions.extraProperties.set("org.jetbrains.dokka.experimental.gradle.pluginMode.noWarn", "true")
+        }
+
         pluginManager.apply(DokkaPlugin::class.java)
-        tasks.withType<DokkaTask>().configureEach {
-            dokkaSourceSets.configureEach {
-                offlineMode.set(true)
+
+        // Configure via the official Dokka V2 DSL API
+        // Use pluginManager.withPlugin to only configure when the plugin is successfully applied
+        pluginManager.withPlugin("org.jetbrains.dokka") {
+            // Use afterEvaluate to ensure the dokka extension is registered
+            afterEvaluate {
+                extensions.findByType(DokkaExtension::class.java)?.apply {
+                    // Set module information for all projects
+                    moduleName.set(name)
+                    moduleVersion.set(version.toString())
+
+                    // Configure HTML publication with offline mode
+                    dokkaPublications.configureEach {
+                        // Enable offline mode - disables all external documentation links
+                        // This prevents Dokka from fetching package-lists from stdlib, JDK, Android SDK, etc.
+                        offlineMode.set(true)
+
+                        // Suppress obvious functions (equals, hashCode, toString)
+                        suppressObviousFunctions.set(true)
+                    }
+                }
             }
         }
 

@@ -78,7 +78,7 @@ class PublishedKotlinLibraryConventionPluginTest {
         output.shouldContainAll(
             "assemble - ",
             "lintKotlin - ",
-            "dokkaHtml - ",
+            "dokkaGenerateHtml - ",
             "koverHtmlReport",
             "publishMavenPublicationToArtifactoryRepository - ",
         )
@@ -161,6 +161,35 @@ class PublishedKotlinLibraryConventionPluginTest {
         )
     }
 
+    @Test
+    fun `WHEN published kotlin library plugin applied THEN dokka is configured with offline mode`() {
+        testProjectBuilder.configureSubproject("kotlin-module") {
+            appendBuildFile(
+                """
+                afterEvaluate {
+                    val dokkaExt = extensions.getByName("dokka") as org.jetbrains.dokka.gradle.DokkaExtension
+                    dokkaExt.dokkaPublications.named("html") {
+                        println("Dokka Offline Mode: ${"$"}{offlineMode.get()}")
+                        println("Dokka Module Name: ${"$"}{dokkaExt.moduleName.get()}")
+                        println("Dokka Suppress Obvious: ${"$"}{suppressObviousFunctions.get()}")
+                    }
+                }
+                """.trimIndent(),
+            )
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "Dokka Offline Mode: true",
+            "Dokka Module Name: kotlin-module",
+            "Dokka Suppress Obvious: true",
+        )
+    }
+
     private fun TestProjectBuilder.printJavaAndKotlinVersions() {
         appendBuildFile(
             """
@@ -179,7 +208,7 @@ class PublishedKotlinLibraryConventionPluginTest {
                         println("Java Source Compatibility: ${"$"}{sourceCompatibility}")
                         println("Java Target Compatibility: ${"$"}{targetCompatibility}")
                     }
-                }    
+                }
             """.trimIndent(),
         )
     }
