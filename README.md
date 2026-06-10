@@ -13,6 +13,7 @@ The plugins require Gradle 8.11.1+ and Android Gradle Plugin 8.9.1+ for Android 
   - [Published Kotlin Library](#published-kotlin-library)
   - [Release Conventions](#release-conventions)
   - [Dependency Management](#dependency-management)
+  - [Dependency Guard](#dependency-guard)
   - [Kotlinter](#kotlinter)
 - [Configuration](#configuration)
   - [Dagger](#dagger)
@@ -60,6 +61,7 @@ Some convention plugins auto-apply other plugins to better support common use ca
 
 ```
 kgp.plugins.autoapply.dependencymanagement=false
+kgp.plugins.autoapply.dependencyguard=false
 kgp.plugins.autoapply.dokka=false
 kgp.plugins.autoapply.kotlinter=false
 kgp.plugins.autoapply.kover=false
@@ -232,6 +234,43 @@ gradlew dependencyUpdates
 ```
 
 A report will be created in the `{projectRoot}/build/dependencyUpdates` directory named `report` in txt and json format by default. The files show what dependencies are up to date, which have newer versions available, and which dependency versions could not be checked.
+
+## Dependency Guard
+
+The [Dependency Guard](https://github.com/dropbox/dependency-guard) plugin is enabled by default for all Android library and Kotlin library projects. Dependency Guard generates baseline files that capture the exact dependencies in your project's classpath. These baselines are checked into source control and used to detect unexpected dependency changes in CI/CD.
+
+The plugin helps prevent:
+- Unintended dependency additions from transitive dependencies
+- Unexpected dependency version changes
+- Binary size increases from new dependencies
+
+Auto-applying the plugin can be disabled by setting the following property to false in the `gradle.properties` file of the project:
+
+```
+kgp.plugins.autoapply.dependencyguard=false
+```
+
+### Configuration
+
+For Android library projects, the following configurations are monitored:
+- `releaseRuntimeClasspath`
+- `releaseCompileClasspath`
+
+For Kotlin JVM library projects, the following configurations are monitored:
+- `runtimeClasspath`
+- `compileClasspath`
+
+JUnit dependencies are filtered out from the baseline by default.
+
+### Tasks
+
+To create or update the baseline files, run:
+
+```
+./gradlew dependencyGuardBaseline
+```
+
+Baseline files are created in `{projectDir}/dependencies/` with a separate file for each monitored configuration.
 
 ## Kotlinter
 The [Kotlinter](https://github.com/jeremymailen/kotlinter-gradle) plugin is enabled by default for all projects that apply an Android plugin (application or library) or a kotlin plugin.
