@@ -236,8 +236,47 @@ class PublishedAndroidLibraryConventionPluginTest {
                             println("Java Target Compatibility: ${"$"}{targetCompatibility}")
                         }
                     }
-                }    
+                }
             """.trimIndent(),
         )
+    }
+
+    @Test
+    fun `WHEN published android library plugin applied THEN dependency guard plugin is auto-applied by default`() {
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "dependencyGuard",
+            "dependencyGuardBaseline",
+        )
+    }
+
+    @Test
+    fun `WHEN published android library plugin applied with dependency guard disabled THEN dependency guard plugin is not applied`() {
+        testProjectBuilder.withProperties {
+            put("kgp.plugins.autoapply.dependencyguard", "false")
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldNotContain("dependencyGuardBaseline")
+    }
+
+    @Test
+    fun `WHEN published android library plugin applied THEN dependency guard tasks are available`() {
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldContain("Dependency Guard tasks")
     }
 }
