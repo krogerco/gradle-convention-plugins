@@ -23,7 +23,6 @@
  */
 package com.kroger.gradle
 
-import com.kroger.gradle.config.MIN_SUPPORTED_GRADLE_VERSION
 import com.kroger.gradle.util.KOTLIN_VERSION
 import com.kroger.gradle.util.RootTestProjectBuilder
 import com.kroger.gradle.util.gradleRunner
@@ -140,21 +139,23 @@ class KrogerRootPluginTest {
     @Test
     fun `GIVEN root plugin WHEN gradle version out of date THEN error occurs`() {
         testProjectBuilder.build()
-        val gradleVersion = "8.11"
+        val gradleVersion = "9.3.0"
+        val minGradleVersion = "9.4.1"
         val result = gradleRunner(testProjectDir, arguments = arrayOf("tasks"))
             .withGradleVersion(gradleVersion)
             .buildAndFail()
 
         result.output.shouldContain(
-            "KGP plugins require Gradle ${MIN_SUPPORTED_GRADLE_VERSION.version} or later. Found Gradle $gradleVersion",
+            "KGP plugins require Gradle $minGradleVersion or later. Found Gradle $gradleVersion",
         )
     }
 
     @Test
     fun `GIVEN root plugin WHEN gradle is min supported version THEN no error`() {
         testProjectBuilder.build()
+        val minGradleVersion = "9.4.1"
         val result = gradleRunner(testProjectDir, arguments = arrayOf("tasks"))
-            .withGradleVersion(MIN_SUPPORTED_GRADLE_VERSION.version)
+            .withGradleVersion(minGradleVersion)
             .build()
 
         result.output.shouldContain("BUILD SUCCESSFUL")

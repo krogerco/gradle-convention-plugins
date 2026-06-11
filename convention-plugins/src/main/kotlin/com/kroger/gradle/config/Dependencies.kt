@@ -252,7 +252,7 @@ public fun Project.moshi(
 )
 public fun Project.roomKapt(
     schemaDirectory: Provider<Directory>,
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     val roomVersion = KgpProperties(project).kgpVersions.kgpAndroidxRoom
     dependencies {
@@ -264,9 +264,9 @@ public fun Project.roomKapt(
     schemaDirectory.orNull?.let { schemaDir ->
         val schemaFile = schemaDir.asFile
         commonRoomConfig(schemaFile, commonExtension, roomVersion)
-        commonExtension.defaultConfig {
-            javaCompileOptions {
-                annotationProcessorOptions {
+        commonExtension.defaultConfig.apply {
+            javaCompileOptions.apply {
+                annotationProcessorOptions.apply {
                     compilerArgumentProviders(RoomSchemaArgProvider(schemaFile, isKsp = false))
                 }
             }
@@ -276,7 +276,7 @@ public fun Project.roomKapt(
 
 private fun Project.commonRoomConfig(
     schemaFile: File,
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
     roomVersion: String,
 ) {
     if (!schemaFile.exists()) {
@@ -285,7 +285,7 @@ private fun Project.commonRoomConfig(
 
     dependencies.add(Configurations.ANDROID_TEST_IMPLEMENTATION, "androidx.room:room-testing:$roomVersion")
 
-    commonExtension.sourceSets {
+    commonExtension.sourceSets.apply {
         // Adds exported schema location as test app assets.
         named("androidTest").configure {
             assets.srcDir(schemaFile.path)
@@ -300,8 +300,8 @@ private fun Project.commonRoomConfig(
  * @param commonExtension used to add [schemaDirectoryPath] to androidTest source set if needed
  */
 public fun Project.room(
-    schemaDirectoryPath: Provider<String?> = provider { project.layout.projectDirectory.dir("schemas").asFile.absolutePath },
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    schemaDirectoryPath: String? = project.layout.projectDirectory.dir("schemas").asFile.absolutePath,
+    commonExtension: CommonExtension,
 ) {
     val roomVersion = KgpProperties(project).kgpVersions.kgpAndroidxRoom
     dependencies {
@@ -311,13 +311,13 @@ public fun Project.room(
         add(Configurations.ANDROID_TEST_IMPLEMENTATION, "androidx.room:room-testing:$roomVersion")
     }
 
-    schemaDirectoryPath.orNull?.let { schemaPath ->
+    schemaDirectoryPath?.let { schemaPath ->
         pluginManager.apply(RoomGradlePlugin::class.java)
         extensions.configure<RoomExtension> {
             schemaDirectory(schemaPath)
         }
 
-        commonExtension.sourceSets {
+        commonExtension.sourceSets.apply {
             // Adds exported schema location as test app assets.
             named("androidTest").configure {
                 assets.srcDir(schemaPath)

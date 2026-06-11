@@ -39,7 +39,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
-import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
 
 /**
  * Apply conventions common to Android libraries.
@@ -55,7 +54,6 @@ public class AndroidLibraryConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply(LibraryPlugin::class.java)
                 apply(AndroidJUnitPlatformPlugin::class.java)
-                apply(KotlinAndroidPluginWrapper::class.java)
                 configureDependencyGuard(kgpProperties.autoApplyDependencyGuard, isAndroidProject = true)
                 configureDokka(kgpProperties.autoApplyDokka, true)
                 configureHilt(kgpProperties.autoConfigureHiltLibrary)

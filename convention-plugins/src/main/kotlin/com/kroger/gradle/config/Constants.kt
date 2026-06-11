@@ -50,5 +50,5 @@ internal object ExtraKeys {
     internal const val KGP_PROPERTIES: String = "kgp.properties"
 }
 
-internal val MIN_SUPPORTED_AGP_VERSION by lazy { AndroidPluginVersion(8, 9, 1) }
-internal val MIN_SUPPORTED_GRADLE_VERSION = GradleVersion.version("8.11.1")
+internal val MIN_SUPPORTED_AGP_VERSION by lazy { AndroidPluginVersion(9, 2, 1) }
+internal val MIN_SUPPORTED_GRADLE_VERSION = GradleVersion.version("9.4.1")

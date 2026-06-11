@@ -63,12 +63,12 @@ class PublishedAndroidLibraryConventionPluginTest {
                     android {
                         namespace = "com.kroger.kgp.testmodule"
                     }
-     
+
                     afterEvaluate {
                         val hasHiltPlugin = pluginManager.hasPlugin("com.google.dagger.hilt.android")
-                        val hasKaptPlugin = pluginManager.hasPlugin("org.jetbrains.kotlin.kapt")
+                        val hasKspPlugin = pluginManager.hasPlugin("com.google.devtools.ksp")
                         println("hasHiltPlugin: ${"$"}hasHiltPlugin")
-                        println("hasKaptPlugin: ${"$"}hasKaptPlugin")
+                        println("hasKspPlugin: ${"$"}hasKspPlugin")
                     }
                     """.trimIndent(),
                 )
@@ -100,12 +100,12 @@ class PublishedAndroidLibraryConventionPluginTest {
             "assemble - ",
             "dokkaHtml - ",
             "installDebugAndroidTest - ",
-            "koverHtmlReportDebug",
+            "koverHtmlReport",
             "lintKotlin - ",
             "publishMavenPublicationToArtifactoryRepository - ",
             // hilt configuration
             "hasHiltPlugin: false",
-            "hasKaptPlugin: false",
+            "hasKspPlugin: false",
         )
     }
 
@@ -127,7 +127,7 @@ class PublishedAndroidLibraryConventionPluginTest {
         output.shouldContainAll(
             // hilt configuration
             "hasHiltPlugin: true",
-            "hasKaptPlugin: true",
+            "hasKspPlugin: true",
         )
     }
 

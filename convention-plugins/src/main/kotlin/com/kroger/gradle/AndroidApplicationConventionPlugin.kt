@@ -37,7 +37,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
-import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
 
 /**
  * Apply conventions common to Android applications.
@@ -53,7 +52,6 @@ public class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply(AppPlugin::class.java)
-                apply(KotlinAndroidPluginWrapper::class.java)
                 configureHilt(kgpProperties.autoConfigureHiltApplication)
                 configureKover(kgpProperties.autoApplyKover)
                 configureKotlinter(kgpProperties.autoApplyKotlinter)
@@ -61,7 +59,7 @@ public class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             extensions.configure<ApplicationExtension> {
                 configureKotlinAndroid(this, kgpProperties, ExplicitApiMode.Disabled)
-                defaultConfig {
+                defaultConfig.apply {
                     versionCode = 1
                     versionName = "1.0"
                     targetSdk = kgpVersions.kgpTargetSdk

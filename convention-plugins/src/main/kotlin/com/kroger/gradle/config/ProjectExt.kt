@@ -90,10 +90,10 @@ internal fun Project.configureDokka(isDokkaEnabled: Boolean, isAndroidProject: B
  */
 internal fun Project.configureHilt(isHiltEnabled: Boolean) {
     if (isHiltEnabled) {
-        pluginManager.apply("org.jetbrains.kotlin.kapt")
+        pluginManager.apply("com.google.devtools.ksp")
         pluginManager.apply(HiltGradlePlugin::class.java)
 
-        hilt()
+        hiltKsp()
     }
 }
 
