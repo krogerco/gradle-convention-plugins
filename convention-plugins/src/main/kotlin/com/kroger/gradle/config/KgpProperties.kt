@@ -35,6 +35,12 @@ internal class KgpProperties private constructor(private val project: Project) {
         get() = project.findOptionalBooleanProperty("kgp.plugins.autoapply.dependencymanagement") != false
 
     /**
+     * Whether to auto-apply the DependencyGuard plugin to supported projects. Default is true.
+     */
+    val autoApplyDependencyGuard: Boolean
+        get() = project.findOptionalBooleanProperty("kgp.plugins.autoapply.dependencyguard") ?: true
+
+    /**
      * Whether to auto-apply the Dokka plugin to supported projects. Default is true.
      */
     val autoApplyDokka: Boolean

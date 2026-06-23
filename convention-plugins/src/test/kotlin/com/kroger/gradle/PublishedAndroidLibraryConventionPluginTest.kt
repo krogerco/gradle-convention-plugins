@@ -218,6 +218,13 @@ class PublishedAndroidLibraryConventionPluginTest {
             "Java Source Compatibility: $jvmTarget",
             "Java Target Compatibility: $jvmTarget",
         )
+
+        output.shouldContain("Dependency Guard tasks")
+
+        output.shouldContainAll(
+            "dependencyGuard",
+            "dependencyGuardBaseline",
+        )
     }
 
     private fun TestProjectBuilder.printJavaAndKotlinVersions() {
@@ -236,7 +243,7 @@ class PublishedAndroidLibraryConventionPluginTest {
                             println("Java Target Compatibility: ${"$"}{targetCompatibility}")
                         }
                     }
-                }    
+                }
             """.trimIndent(),
         )
     }

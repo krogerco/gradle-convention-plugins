@@ -30,6 +30,7 @@ import com.kroger.gradle.util.TestProjectBuilder
 import com.kroger.gradle.util.gradleRunner
 import com.kroger.gradle.util.rootProject
 import com.kroger.gradle.util.shouldContainAll
+import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -179,8 +180,47 @@ class PublishedKotlinLibraryConventionPluginTest {
                         println("Java Source Compatibility: ${"$"}{sourceCompatibility}")
                         println("Java Target Compatibility: ${"$"}{targetCompatibility}")
                     }
-                }    
+                }
             """.trimIndent(),
         )
+    }
+
+    @Test
+    fun `WHEN published kotlin library plugin applied THEN dependency guard plugin is auto-applied by default`() {
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "dependencyGuard",
+            "dependencyGuardBaseline",
+        )
+    }
+
+    @Test
+    fun `WHEN published kotlin library plugin applied with dependency guard disabled THEN dependency guard plugin is not applied`() {
+        testProjectBuilder.withProperties {
+            put("kgp.plugins.autoapply.dependencyguard", "false")
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
+            .build()
+            .output
+
+        output.shouldNotContain("dependencyGuardBaseline")
+    }
+
+    @Test
+    fun `WHEN published kotlin library plugin applied THEN dependency guard tasks are available`() {
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
+            .build()
+            .output
+
+        output.shouldContain("Dependency Guard tasks")
     }
 }

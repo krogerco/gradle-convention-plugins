@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - [Feat]: allow jvmTarget, kotlin languageVersion, and kotlin apiVersion to be specified individually in version catalog
 - [Feat]: support Kotlin 2.x
 - [Feat]: support new compose compiler plugin for Kotlin 2.x
+- [Feat]: auto-apply Dependency Guard plugin to Android and Kotlin library projects to track classpath dependencies
 - [Feat]: org.junit.platform:junit-platform-launcher added as testRuntimeOnly dependency for junit5()
 - [Feat]: kgpJunit5 version renamed to kgpJunitBom
 - [Feat]: added kgp.repository.credentials.env.username and kgp.repository.credentials.env.password properties to allow setting repository credentials from custom environment variables
