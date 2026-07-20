@@ -37,6 +37,35 @@ import org.jmailen.gradle.kotlinter.KotlinterPlugin
 
 // region plugin configuration
 /**
+ * When [isDependencyGuardEnabled] is true, adds the DependencyGuard plugin.
+ */
+internal fun Project.configureDependencyGuard(isDependencyGuardEnabled: Boolean, isAndroidProject: Boolean = false) {
+    if (isDependencyGuardEnabled) {
+        val runtimeClassPath = if (isAndroidProject) {
+            "releaseRuntimeClasspath"
+        } else {
+            "runtimeClasspath"
+        }
+        val compileClasspath = if (isAndroidProject) {
+            "releaseCompileClasspath"
+        } else {
+            "compileClasspath"
+        }
+        pluginManager.apply("com.dropbox.dependency-guard")
+        pluginManager.withPlugin("com.dropbox.dependency-guard") {
+            extensions.configure<com.dropbox.gradle.plugins.dependencyguard.DependencyGuardPluginExtension>("dependencyGuard") {
+                configuration(runtimeClassPath) {
+                    allowedFilter = {
+                        !it.contains("junit")
+                    }
+                }
+                configuration(compileClasspath)
+            }
+        }
+    }
+}
+
+/**
  * When [isDokkaEnabled] is true, adds the Dokka plugin.
  * @param isAndroidProject when true adds the android documentation plugin dependency
  */

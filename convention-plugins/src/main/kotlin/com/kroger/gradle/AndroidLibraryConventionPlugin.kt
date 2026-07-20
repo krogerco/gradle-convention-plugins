@@ -28,12 +28,12 @@ import com.android.build.api.dsl.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.kroger.gradle.config.KgpProperties
 import com.kroger.gradle.config.MIN_SUPPORTED_AGP_VERSION
+import com.kroger.gradle.config.configureDependencyGuard
 import com.kroger.gradle.config.configureDokka
 import com.kroger.gradle.config.configureHilt
 import com.kroger.gradle.config.configureKotlinAndroid
 import com.kroger.gradle.config.configureKotlinter
 import com.kroger.gradle.config.configureKover
-import com.kroger.gradle.config.version
 import de.mannodermaus.gradle.plugins.junit5.AndroidJUnitPlatformPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -56,6 +56,7 @@ public class AndroidLibraryConventionPlugin : Plugin<Project> {
                 apply(LibraryPlugin::class.java)
                 apply(AndroidJUnitPlatformPlugin::class.java)
                 apply(KotlinAndroidPluginWrapper::class.java)
+                configureDependencyGuard(kgpProperties.autoApplyDependencyGuard, isAndroidProject = true)
                 configureDokka(kgpProperties.autoApplyDokka, true)
                 configureHilt(kgpProperties.autoConfigureHiltLibrary)
                 configureKover(kgpProperties.autoApplyKover)

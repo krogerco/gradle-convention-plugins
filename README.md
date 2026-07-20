@@ -1,7 +1,7 @@
 # Gradle Convention Plugins
 
 A collection of convention plugins to consistently configure Android applications and libraries.
-The plugins require Gradle 8.4+ and Android Gradle Plugin 8.3+ for Android projects.
+The plugins require Gradle 8.11.1+ and Android Gradle Plugin 8.9.1+ for Android projects.
 
 - [Installation](#installation)
   - [Version Catalog Requirements](#version-catalog-requirements)
@@ -13,6 +13,7 @@ The plugins require Gradle 8.4+ and Android Gradle Plugin 8.3+ for Android proje
   - [Published Kotlin Library](#published-kotlin-library)
   - [Release Conventions](#release-conventions)
   - [Dependency Management](#dependency-management)
+  - [Dependency Guard](#dependency-guard)
   - [Kotlinter](#kotlinter)
 - [Configuration](#configuration)
   - [Dagger](#dagger)
@@ -43,6 +44,9 @@ When using the convention plugins certain versions are expected to be in the ver
 
 The following versions are required in the version catalog:
 - **kgpJdk**: The JDK version to use when setting `jvmToolchain`.
+- **kgpJvmTarget**: Defaults to the kgpJdk version but can be overridden to set the JVM target version if different.
+- **kgpKotlinApiVersion**: The Kotlin API version to use. Defaults to the Kotlin Gradle Plugin version.
+- **kgpKotlinLanguageVersion**: The Kotlin language version to use. Defaults to the Kotlin Gradle Plugin version.
 
 The following versions are required in the version catalog when using Android convention plugins:
 - **kgpCompileSdk**: The SDK version the application compiles against.
@@ -57,6 +61,7 @@ Some convention plugins auto-apply other plugins to better support common use ca
 
 ```
 kgp.plugins.autoapply.dependencymanagement=false
+kgp.plugins.autoapply.dependencyguard=false
 kgp.plugins.autoapply.dokka=false
 kgp.plugins.autoapply.kotlinter=false
 kgp.plugins.autoapply.kover=false
@@ -164,9 +169,10 @@ This plugin is automatically applied when using either the Published Android Lib
 These default values can be changed by using further configuration in the `build.gradle.kts` file of the project or the `gradle.properties` file of the project as shown in the [documentation](https://vanniktech.github.io/gradle-maven-publish-plugin/other/#github-packages-example).
 
 The following additional properties can be added to the `gradle.properties` file:
+- **kgp.repository.credentials.env.password:** the name of the environment variable containing the repository password. Default is `ARTIFACTORY_PASSWORD`.
+- **kgp.repository.credentials.env.username:** the name of the environment variable containing the repository username. Default is `ARTIFACTORY_USERNAME`.
 - **kgp.repository.name:** the name of the repository as it will appear in generated Gradle tasks. Default is `Artifactory`.
 - **kgp.repository.url:** the `URL` of the repository to publish to. Default is null.
-
 
 ### Standalone Usage
 
@@ -228,6 +234,43 @@ gradlew dependencyUpdates
 ```
 
 A report will be created in the `{projectRoot}/build/dependencyUpdates` directory named `report` in txt and json format by default. The files show what dependencies are up to date, which have newer versions available, and which dependency versions could not be checked.
+
+## Dependency Guard
+
+The [Dependency Guard](https://github.com/dropbox/dependency-guard) plugin is enabled by default for all Android library and Kotlin library projects. Dependency Guard generates baseline files that capture the exact dependencies in your project's classpath. These baselines are checked into source control and used to detect unexpected dependency changes in CI/CD.
+
+The plugin helps prevent:
+- Unintended dependency additions from transitive dependencies
+- Unexpected dependency version changes
+- Binary size increases from new dependencies
+
+Auto-applying the plugin can be disabled by setting the following property to false in the `gradle.properties` file of the project:
+
+```
+kgp.plugins.autoapply.dependencyguard=false
+```
+
+### Configuration
+
+For Android library projects, the following configurations are monitored:
+- `releaseRuntimeClasspath`
+- `releaseCompileClasspath`
+
+For Kotlin JVM library projects, the following configurations are monitored:
+- `runtimeClasspath`
+- `compileClasspath`
+
+JUnit dependencies are filtered out from the baseline by default.
+
+### Tasks
+
+To create or update the baseline files, run:
+
+```
+./gradlew dependencyGuardBaseline
+```
+
+Baseline files are created in `{projectDir}/dependencies/` with a separate file for each monitored configuration.
 
 ## Kotlinter
 The [Kotlinter](https://github.com/jeremymailen/kotlinter-gradle) plugin is enabled by default for all projects that apply an Android plugin (application or library) or a kotlin plugin.
@@ -315,7 +358,6 @@ Auto-configuration does the following:
 ### Version Catalog Requirements
 The following versions and bundle are expected in the Version Catalog when using Jetpack Compose auto-configuration:
 - **`kgpAndroidxComposeBom`:** [Jetpack Compose Bill of Materials](https://developer.android.com/jetpack/compose/bom) version to use for Jetpack Compose dependencies.
-- **`kgpAndroidxComposeCompiler`:** Version of the Jetpack Compose Compiler to use. The version specified should be compatible with the version of the Kotlin Compiler Plugin used according to the [Compatibility Map](https://developer.android.com/jetpack/androidx/releases/compose-kotlin).
 - **`kgpCompose`:** This Bundle is only required in the Version Catalog if the `kgp.android.autoconfigure.compose.dependencies` property is set to `bundle`. If it is then the `compose` bundle is added to the dependencies of the project.
 
 ### Properties
@@ -335,7 +377,7 @@ A couple utility functions exist to help configure `JUnit` dependencies:
 ### Version Catalog Requirements
 The following versions are expected in the Version Catalog when using the `junit` utility functions:
 - **`kgpJunit4`:** The version of `junit4`. This is only required if `junitVintage()` is used.
-- **`kgpJunit5`:** The version of `junit5`.
+- **`kgpJunitBom`:** What BOM version to use for JUnit 5 dependencies.
 
 ## Kotlinx Serialization
 The following utility function exists to help configure `Kotlinx Serialization`:

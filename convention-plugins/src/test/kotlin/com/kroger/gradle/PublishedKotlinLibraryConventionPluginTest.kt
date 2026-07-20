@@ -26,9 +26,11 @@ package com.kroger.gradle
 import com.kroger.gradle.util.JDK_VERSION
 import com.kroger.gradle.util.KOTLIN_VERSION
 import com.kroger.gradle.util.RootTestProjectBuilder
+import com.kroger.gradle.util.TestProjectBuilder
 import com.kroger.gradle.util.gradleRunner
 import com.kroger.gradle.util.rootProject
 import com.kroger.gradle.util.shouldContainAll
+import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -65,6 +67,12 @@ class PublishedKotlinLibraryConventionPluginTest {
         testProjectBuilder.build()
 
         val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
+            .withEnvironment(
+                mapOf(
+                    "ARTIFACTORY_USERNAME" to "fakeusername",
+                    "ARTIFACTORY_PASSWORD" to "fakepassword",
+                ),
+            )
             .build()
             .output
 
@@ -102,6 +110,117 @@ class PublishedKotlinLibraryConventionPluginTest {
             .build()
             .output
 
-        output.shouldNotContain("dokka")
+        output
+            .substringAfter("Task :kotlin-module:tasks") // in the current version of dokka there are warnings printed
+            .shouldNotContain("dokka")
+    }
+
+    @Test
+    fun `WHEN published kotlin library plugin applied with no java or kotlin overrides set THEN expected defaults used`() {
+        testProjectBuilder.configureSubproject("kotlin-module") {
+            printJavaAndKotlinVersions()
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "Kotlin API Version: null",
+            "Kotlin Language Version: null",
+            "Java Release: $JDK_VERSION",
+            "Java Source Compatibility: $JDK_VERSION",
+            "Java Target Compatibility: $JDK_VERSION",
+        )
+    }
+
+    @Test
+    fun `WHEN published kotlin library plugin applied with java and kotlin overrides set THEN override values are used`() {
+        val jvmTarget = "11"
+        val kotlinVersion = "1.9"
+        testProjectBuilder.versionCatalogSpec.versions.apply {
+            put("kgpJvmTarget", "\"$jvmTarget\"")
+            put("kgpKotlinApiVersion", "\"$kotlinVersion\"")
+            put("kgpKotlinLanguageVersion", "\"$kotlinVersion\"")
+        }
+        testProjectBuilder.configureSubproject("kotlin-module") {
+            printJavaAndKotlinVersions()
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "Kotlin API Version: $kotlinVersion",
+            "Kotlin Language Version: $kotlinVersion",
+            "Java Release: $jvmTarget",
+            "Java Source Compatibility: $JDK_VERSION",
+            "Java Target Compatibility: $JDK_VERSION",
+        )
+    }
+
+    private fun TestProjectBuilder.printJavaAndKotlinVersions() {
+        appendBuildFile(
+            """
+                afterEvaluate {
+                    kotlin {
+                        compilerOptions {
+                            println("Kotlin API Version: ${"$"}{apiVersion.orNull?.version}")
+                            println("Kotlin Language Version: ${"$"}{languageVersion.orNull?.version}")
+                        }
+                    }
+
+                    tasks.withType<JavaCompile>().configureEach {
+                        println("Java Release: ${"$"}{options.release.get()}")
+                    }
+                    java {
+                        println("Java Source Compatibility: ${"$"}{sourceCompatibility}")
+                        println("Java Target Compatibility: ${"$"}{targetCompatibility}")
+                    }
+                }
+            """.trimIndent(),
+        )
+    }
+
+    @Test
+    fun `WHEN published kotlin library plugin applied THEN dependency guard plugin is auto-applied by default`() {
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "dependencyGuard",
+            "dependencyGuardBaseline",
+        )
+    }
+
+    @Test
+    fun `WHEN published kotlin library plugin applied with dependency guard disabled THEN dependency guard plugin is not applied`() {
+        testProjectBuilder.withProperties {
+            put("kgp.plugins.autoapply.dependencyguard", "false")
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
+            .build()
+            .output
+
+        output.shouldNotContain("dependencyGuardBaseline")
+    }
+
+    @Test
+    fun `WHEN published kotlin library plugin applied THEN dependency guard tasks are available`() {
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":kotlin-module:tasks")
+            .build()
+            .output
+
+        output.shouldContain("Dependency Guard tasks")
     }
 }

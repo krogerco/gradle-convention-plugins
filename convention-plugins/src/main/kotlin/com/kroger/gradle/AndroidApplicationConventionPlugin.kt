@@ -33,7 +33,6 @@ import com.kroger.gradle.config.configureHilt
 import com.kroger.gradle.config.configureKotlinAndroid
 import com.kroger.gradle.config.configureKotlinter
 import com.kroger.gradle.config.configureKover
-import com.kroger.gradle.config.version
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure

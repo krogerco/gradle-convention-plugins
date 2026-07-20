@@ -26,6 +26,7 @@ package com.kroger.gradle
 import com.kroger.gradle.util.JDK_VERSION
 import com.kroger.gradle.util.KOTLIN_VERSION
 import com.kroger.gradle.util.RootTestProjectBuilder
+import com.kroger.gradle.util.TestProjectBuilder
 import com.kroger.gradle.util.gradleRunner
 import com.kroger.gradle.util.rootProject
 import com.kroger.gradle.util.shouldContainAll
@@ -46,7 +47,6 @@ class PublishedAndroidLibraryConventionPluginTest {
         testProjectBuilder = rootProject(projectDir = testProjectDir) {
             versionCatalogSpec.versions.apply {
                 put("kgpAndroidDesugarJdkLibs", "\"1.0.0\"")
-                put("kgpAndroidxComposeCompiler", "\"1.3.2\"")
                 put("kgpAndroidxComposeBom", "\"2022-12-00\"")
                 put("kgpCompileSdk", "\"32\"")
                 put("kgpDokka", "\"1.8.20\"")
@@ -86,6 +86,12 @@ class PublishedAndroidLibraryConventionPluginTest {
         testProjectBuilder.build()
 
         val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .withEnvironment(
+                mapOf(
+                    "ARTIFACTORY_USERNAME" to "fakeusername",
+                    "ARTIFACTORY_PASSWORD" to "fakepassword",
+                ),
+            )
             .build()
             .output
 
@@ -150,7 +156,9 @@ class PublishedAndroidLibraryConventionPluginTest {
             .build()
             .output
 
-        output.shouldNotContain("dokka")
+        output
+            .substringAfter("Task :android-library-module:tasks") // in the current version of dokka there are warnings printed
+            .shouldNotContain("dokka")
     }
 
     @Test
@@ -163,6 +171,80 @@ class PublishedAndroidLibraryConventionPluginTest {
             .buildAndFail()
             .output
 
-        output.shouldContain("Missing version catalog with name: libs")
+        output
+            .shouldContain("Missing version catalog with name: libs")
+    }
+
+    @Test
+    fun `WHEN published android library plugin applied with no java or kotlin overrides set THEN expected defaults used`() {
+        testProjectBuilder.configureSubproject("android-library-module") {
+            printJavaAndKotlinVersions()
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "Kotlin API Version: null",
+            "Kotlin Language Version: null",
+            "Java Source Compatibility: $JDK_VERSION",
+            "Java Target Compatibility: $JDK_VERSION",
+        )
+    }
+
+    @Test
+    fun `WHEN published android library plugin applied with java and kotlin overrides set THEN override values are used`() {
+        val jvmTarget = "11"
+        val kotlinVersion = "1.9"
+        testProjectBuilder.versionCatalogSpec.versions.apply {
+            put("kgpJvmTarget", "\"$jvmTarget\"")
+            put("kgpKotlinApiVersion", "\"$kotlinVersion\"")
+            put("kgpKotlinLanguageVersion", "\"$kotlinVersion\"")
+        }
+        testProjectBuilder.configureSubproject("android-library-module") {
+            printJavaAndKotlinVersions()
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "Kotlin API Version: $kotlinVersion",
+            "Kotlin Language Version: $kotlinVersion",
+            "Java Source Compatibility: $jvmTarget",
+            "Java Target Compatibility: $jvmTarget",
+        )
+
+        output.shouldContain("Dependency Guard tasks")
+
+        output.shouldContainAll(
+            "dependencyGuard",
+            "dependencyGuardBaseline",
+        )
+    }
+
+    private fun TestProjectBuilder.printJavaAndKotlinVersions() {
+        appendBuildFile(
+            """
+                afterEvaluate {
+                    kotlin {
+                        compilerOptions {
+                            println("Kotlin API Version: ${"$"}{apiVersion.orNull?.version}")
+                            println("Kotlin Language Version: ${"$"}{languageVersion.orNull?.version}")
+                        }
+                    }
+                    android {
+                        compileOptions {
+                            println("Java Source Compatibility: ${"$"}{sourceCompatibility}")
+                            println("Java Target Compatibility: ${"$"}{targetCompatibility}")
+                        }
+                    }
+                }
+            """.trimIndent(),
+        )
     }
 }

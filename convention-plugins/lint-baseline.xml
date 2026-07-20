@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.9.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.9.1)" variant="all" version="8.9.1">
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Avoid using method getRootProject"
+        errorLine1="        val rootProject = project.rootProject"
+        errorLine2="                                  ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/kroger/gradle/config/KgpProperties.kt"
+            line="102"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Avoid using method getRootProject"
+        errorLine1="        require(target == target.rootProject) {"
+        errorLine2="                                 ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/kroger/gradle/KrogerRootPlugin.kt"
+            line="42"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Avoid using method getRootProject"
+        errorLine1="                    group = &quot;com.kroger.${rootProject.name}&quot;"
+        errorLine2="                                          ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/kroger/gradle/KrogerRootPlugin.kt"
+            line="63"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Avoid using method getRootProject"
+        errorLine1="                    group = &quot;com.kroger.${rootProject.name}&quot;"
+        errorLine2="                                          ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/kroger/gradle/KrogerRootPlugin.kt"
+            line="63"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Avoid using method getRootProject"
+        errorLine1="                delete(rootProject.layout.buildDirectory)"
+        errorLine2="                       ~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/kroger/gradle/KrogerRootPlugin.kt"
+            line="70"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="GradleProjectIsolation"
+        message="Use providers.gradleProperty instead of findProperty"
+        errorLine1="    findProperty(propertyName)?.toString()"
+        errorLine2="    ~~~~~~~~~~~~">
+        <location
+            file="src/main/kotlin/com/kroger/gradle/config/ProjectExt.kt"
+            line="100"
+            column="5"/>
+    </issue>
+
+</issues>
