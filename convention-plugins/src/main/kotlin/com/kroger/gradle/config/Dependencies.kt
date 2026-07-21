@@ -300,7 +300,7 @@ private fun Project.commonRoomConfig(
  * @param commonExtension used to add [schemaDirectoryPath] to androidTest source set if needed
  */
 public fun Project.room(
-    schemaDirectoryPath: Provider<String?> = provider { project.layout.projectDirectory.dir("schemas").asFile.absolutePath },
+    schemaDirectoryPath: Provider<String>? = provider { project.layout.projectDirectory.dir("schemas").asFile.absolutePath },
     commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) {
     val roomVersion = KgpProperties(project).kgpVersions.kgpAndroidxRoom
@@ -311,7 +311,7 @@ public fun Project.room(
         add(Configurations.ANDROID_TEST_IMPLEMENTATION, "androidx.room:room-testing:$roomVersion")
     }
 
-    schemaDirectoryPath.orNull?.let { schemaPath ->
+    schemaDirectoryPath?.get()?.let { schemaPath ->
         pluginManager.apply(RoomGradlePlugin::class.java)
         extensions.configure<RoomExtension> {
             schemaDirectory(schemaPath)

@@ -121,7 +121,7 @@ class DependencyTests {
     @Test
     fun `GIVEN room called with null schemaDir THEN expected dependencies added`() {
         testProjectBuilder.configureSubproject("android-library-module") {
-            appendBuildFile("room(provider { null }, extensions.getByType(LibraryExtension::class))")
+            appendBuildFile("room(null, extensions.getByType(LibraryExtension::class))")
         }
         testProjectBuilder.build()
         val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
