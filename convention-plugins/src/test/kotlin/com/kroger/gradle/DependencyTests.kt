@@ -58,6 +58,7 @@ class DependencyTests {
                 put("kgpJunitBom", "\"5.12.0\"")
                 put("kgpMinSdk", "\"26\"")
                 put("kgpMoshi", "\"1.0.0\"")
+                put("kgpTargetSdk", "\"32\"")
             }
             addPlugin("com.kroger.gradle.root")
             addPlugin("com.kroger.gradle.published-android-library-conventions", apply = false)

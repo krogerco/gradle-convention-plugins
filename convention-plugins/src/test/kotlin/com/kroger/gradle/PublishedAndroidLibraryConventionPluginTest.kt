@@ -53,6 +53,7 @@ class PublishedAndroidLibraryConventionPluginTest {
                 put("kgpKotlin", "\"$KOTLIN_VERSION\"")
                 put("kgpJdk", "\"$JDK_VERSION\"")
                 put("kgpMinSdk", "\"26\"")
+                put("kgpTargetSdk", "\"32\"")
             }
             addPlugin("com.kroger.gradle.root")
             addPlugin("com.kroger.gradle.published-android-library-conventions", apply = false)
