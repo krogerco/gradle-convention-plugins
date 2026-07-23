@@ -85,7 +85,7 @@ internal class KgpProperties private constructor(private val project: Project) {
             try {
                 ComposeDependencies.valueOf(propertyValue.uppercase())
             } catch (e: IllegalArgumentException) {
-                val composeDependencies = ComposeDependencies.values().joinToString { it.name.lowercase() }
+                val composeDependencies = ComposeDependencies.entries.joinToString { it.name.lowercase() }
                 throw IllegalArgumentException("Invalid compose dependencies value: $propertyValue. Valid values are: $composeDependencies", e)
             }
         } ?: ComposeDependencies.NONE

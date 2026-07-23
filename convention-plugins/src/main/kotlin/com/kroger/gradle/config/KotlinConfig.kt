@@ -39,7 +39,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 internal fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
     kgpProperties: KgpProperties,
     explicitApiMode: ExplicitApiMode,
 ) {
@@ -48,7 +48,7 @@ internal fun Project.configureKotlinAndroid(
     with(commonExtension) {
         compileSdk = kgpVersions.kgpCompileSdk
 
-        defaultConfig {
+        defaultConfig.apply {
             minSdk = kgpVersions.kgpMinSdk
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
@@ -57,7 +57,7 @@ internal fun Project.configureKotlinAndroid(
             configureCompose(commonExtension)
         }
 
-        compileOptions {
+        compileOptions.apply {
             val javaVersion = JavaVersion.toVersion(kgpVersions.kgpJvmTarget)
             sourceCompatibility = javaVersion
             targetCompatibility = javaVersion
@@ -68,7 +68,7 @@ internal fun Project.configureKotlinAndroid(
             coreLibraryDesugaring()
         }
 
-        packaging {
+        packaging.apply {
             resources.excludes.add("/META-INF/{AL2.0,LGPL2.1}")
         }
     }
@@ -106,7 +106,7 @@ internal fun Project.configureKotlin(kgpVersions: KgpVersions, explicitApiMode: 
  * If auto-configure compose dependencies is enabled, the dependencies are added.
  */
 public fun Project.configureCompose(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
     val kgpProperties = KgpProperties(this)

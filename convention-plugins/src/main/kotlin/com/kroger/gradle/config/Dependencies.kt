@@ -251,8 +251,8 @@ public fun Project.moshi(
     ),
 )
 public fun Project.roomKapt(
-    schemaDirectory: Provider<Directory>,
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    schemaDirectory: Provider<Directory>?,
+    commonExtension: CommonExtension,
 ) {
     val roomVersion = KgpProperties(project).kgpVersions.kgpAndroidxRoom
     dependencies {
@@ -261,10 +261,10 @@ public fun Project.roomKapt(
         add(Configurations.KAPT, "androidx.room:room-compiler:$roomVersion")
     }
 
-    schemaDirectory.orNull?.let { schemaDir ->
+    schemaDirectory?.get()?.let { schemaDir ->
         val schemaFile = schemaDir.asFile
         commonRoomConfig(schemaFile, commonExtension, roomVersion)
-        commonExtension.defaultConfig {
+        commonExtension.defaultConfig.apply {
             javaCompileOptions {
                 annotationProcessorOptions {
                     compilerArgumentProviders(RoomSchemaArgProvider(schemaFile, isKsp = false))
@@ -276,7 +276,7 @@ public fun Project.roomKapt(
 
 private fun Project.commonRoomConfig(
     schemaFile: File,
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
     roomVersion: String,
 ) {
     if (!schemaFile.exists()) {
@@ -285,10 +285,10 @@ private fun Project.commonRoomConfig(
 
     dependencies.add(Configurations.ANDROID_TEST_IMPLEMENTATION, "androidx.room:room-testing:$roomVersion")
 
-    commonExtension.sourceSets {
+    commonExtension.sourceSets.apply {
         // Adds exported schema location as test app assets.
         named("androidTest").configure {
-            assets.srcDir(schemaFile.path)
+            assets.directories.add(schemaFile.path)
         }
     }
 }
@@ -301,7 +301,7 @@ private fun Project.commonRoomConfig(
  */
 public fun Project.room(
     schemaDirectoryPath: Provider<String>? = provider { project.layout.projectDirectory.dir("schemas").asFile.absolutePath },
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     val roomVersion = KgpProperties(project).kgpVersions.kgpAndroidxRoom
     dependencies {
@@ -317,10 +317,10 @@ public fun Project.room(
             schemaDirectory(schemaPath)
         }
 
-        commonExtension.sourceSets {
+        commonExtension.sourceSets.apply {
             // Adds exported schema location as test app assets.
             named("androidTest").configure {
-                assets.srcDir(schemaPath)
+                assets.directories.add(schemaPath)
             }
         }
     }

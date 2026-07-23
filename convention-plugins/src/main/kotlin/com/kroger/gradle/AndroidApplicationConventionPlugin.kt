@@ -53,7 +53,6 @@ public class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply(AppPlugin::class.java)
-                apply(KotlinAndroidPluginWrapper::class.java)
                 configureHilt(kgpProperties.autoConfigureHiltApplication)
                 configureKover(kgpProperties.autoApplyKover)
                 configureKotlinter(kgpProperties.autoApplyKotlinter)

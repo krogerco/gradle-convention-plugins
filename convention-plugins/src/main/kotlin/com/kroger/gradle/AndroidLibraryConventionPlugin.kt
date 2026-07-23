@@ -57,7 +57,6 @@ public class AndroidLibraryConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply(LibraryPlugin::class.java)
                 apply(AndroidJUnitPlatformPlugin::class.java)
-                apply(KotlinAndroidPluginWrapper::class.java)
                 configureDependencyGuard(kgpProperties.autoApplyDependencyGuard, isAndroidProject = true)
                 configureDokka(kgpProperties.autoApplyDokka, true)
                 configureHilt(kgpProperties.autoConfigureHiltLibrary)
