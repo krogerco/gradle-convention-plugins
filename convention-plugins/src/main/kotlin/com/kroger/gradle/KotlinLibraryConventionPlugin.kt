@@ -24,6 +24,7 @@
 package com.kroger.gradle
 
 import com.kroger.gradle.config.KgpProperties
+import com.kroger.gradle.config.configureAbiValidation
 import com.kroger.gradle.config.configureDependencyGuard
 import com.kroger.gradle.config.configureDokka
 import com.kroger.gradle.config.configureKotlin
@@ -61,6 +62,7 @@ public class KotlinLibraryConventionPlugin : Plugin<Project> {
             tasks.withType<JavaCompile>().configureEach {
                 options.release = kgpVersions.kgpJvmTarget
             }
+            configureAbiValidation(kgpProperties.autoApplyAbiValidation)
         }
     }
 }

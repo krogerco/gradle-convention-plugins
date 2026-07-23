@@ -29,13 +29,30 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.DokkaPlugin
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationExtension
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
+import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jmailen.gradle.kotlinter.KotlinterPlugin
 
 // region plugin configuration
+/**
+ * When [isAbiValidationEnabled] is true, enables Kotlin's experimental built-in ABI validation (Kotlin 2.2+).
+ * This is applied on individual Kotlin projects.
+ */
+@OptIn(ExperimentalAbiValidation::class)
+internal fun Project.configureAbiValidation(isAbiValidationEnabled: Boolean) {
+    if (isAbiValidationEnabled) {
+        kotlinExtension.configure<AbiValidationExtension> {
+            enabled.set(isAbiValidationEnabled)
+        }
+    }
+}
+
 /**
  * When [isDependencyGuardEnabled] is true, adds the DependencyGuard plugin.
  */

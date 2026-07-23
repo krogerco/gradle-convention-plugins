@@ -29,6 +29,12 @@ import org.gradle.kotlin.dsl.extra
 
 internal class KgpProperties private constructor(private val project: Project) {
     /**
+     * Whether to auto-apply the ABI validation plugin to supported projects. Default is true.
+     */
+    val autoApplyAbiValidation: Boolean
+        get() = project.findOptionalBooleanProperty("kgp.plugins.autoapply.abivalidation") != false
+
+    /**
      * Whether to auto-apply the Dependency Maintenance plugin to the root project. Default is true.
      */
     val autoApplyDependencyManagement: Boolean
