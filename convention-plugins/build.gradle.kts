@@ -134,6 +134,5 @@ dependencies {
     testImplementation(libs.jupiter.api)
     testImplementation(libs.koTest)
 
-    testRuntimeDependencies(libs.gradlePlugins.foojayResolver)
     testRuntimeDependencies(libs.gradlePlugins.kotlin.serialization)
 }
