@@ -182,7 +182,7 @@ class KrogerRootPluginTest {
     @Test
     fun `GIVEN root plugin WHEN gradle version out of date THEN error occurs`() {
         testProjectBuilder.build()
-        val gradleVersion = "8.11"
+        val gradleVersion = "9.1.0"
         val result = gradleRunner(testProjectDir, arguments = arrayOf("tasks"))
             .withGradleVersion(gradleVersion)
             .buildAndFail()
