@@ -104,7 +104,8 @@ class AndroidLibraryConventionPluginTest {
                 """
                 afterEvaluate {
                     android {
-                        println("targetSdk: ${"$"}{defaultConfig.targetSdk}")
+                        println("testOptionsTargetSdk: ${"$"}{testOptions.targetSdk}")
+                        println("lintTargetSdk: ${"$"}{lint.targetSdk}")
                         println("minSdk: ${"$"}{defaultConfig.minSdk}")
                         println("compileSdk: ${"$"}{compileSdk}")
                     }
@@ -119,7 +120,8 @@ class AndroidLibraryConventionPluginTest {
             .output
 
         output.shouldContainAll(
-            "targetSdk: 32",
+            "testOptionsTargetSdk: 32",
+            "lintTargetSdk: 32",
             "minSdk: 26",
             "compileSdk: 32",
         )
