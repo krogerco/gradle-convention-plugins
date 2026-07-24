@@ -112,6 +112,7 @@ gradlePlugin {
 dependencies {
     compileOnly(libs.gradlePlugins.android)
     compileOnly(libs.gradlePlugins.androidJunit5)
+    compileOnly(libs.gradlePlugins.binaryCompatibilityValidator)
     compileOnly(libs.gradlePlugins.compose)
     compileOnly(libs.gradlePlugins.dependencyAnalysis)
     compileOnly(libs.gradlePlugins.dependencyGuard)

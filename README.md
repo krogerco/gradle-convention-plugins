@@ -13,6 +13,7 @@ The plugins require Gradle 8.11.1+ and Android Gradle Plugin 8.9.1+ for Android 
   - [Published Kotlin Library](#published-kotlin-library)
   - [Release Conventions](#release-conventions)
   - [Dependency Management](#dependency-management)
+  - [ABI Validation](#abi-validation)
   - [Dependency Guard](#dependency-guard)
   - [Kotlinter](#kotlinter)
 - [Configuration](#configuration)
@@ -60,6 +61,7 @@ The following versions are required in the version catalog when using Android co
 Some convention plugins auto-apply other plugins to better support common use cases. However, it is possible the plugins are not wanted on certain projects. When present in the `gradle.properties` file, the properties below can be used to prevent plugins from being auto-applied on supported projects:
 
 ```
+kgp.plugins.autoapply.abivalidation=false
 kgp.plugins.autoapply.dependencymanagement=false
 kgp.plugins.autoapply.dependencyguard=false
 kgp.plugins.autoapply.dokka=false
@@ -110,6 +112,7 @@ plugins {
     - Release Conventions
     - Android Library
     - Kotlin Android
+    - [Binary Compatibility Validator](https://github.com/Kotlin/binary-compatibility-validator) (see [ABI Validation](#abi-validation))
     - [Kover](https://github.com/Kotlin/kotlinx-kover)
     - [Dokka](https://github.com/Kotlin/dokka)
     - [android-junit5](https://github.com/mannodermaus/android-junit5)
@@ -139,6 +142,7 @@ plugins {
     - Release Conventions
     - Kotlin JVM
     - Java Library
+    - [Binary Compatibility Validator](https://github.com/Kotlin/binary-compatibility-validator) (see [ABI Validation](#abi-validation))
     - [Kover](https://github.com/Kotlin/kotlinx-kover)
     - [Dokka](https://github.com/Kotlin/dokka)
 
@@ -234,6 +238,63 @@ gradlew dependencyUpdates
 ```
 
 A report will be created in the `{projectRoot}/build/dependencyUpdates` directory named `report` in txt and json format by default. The files show what dependencies are up to date, which have newer versions available, and which dependency versions could not be checked.
+
+## ABI Validation
+
+The [Binary Compatibility Validator](https://github.com/Kotlin/binary-compatibility-validator) (BCV) plugin is enabled by default for all Android library and Kotlin library projects. BCV generates `.api` files that capture the public API surface of your library. These files are checked into source control and used to detect unintended API changes.
+
+The plugin helps prevent:
+- Accidental removal or modification of public API
+- Unintended binary-incompatible changes
+- Breaking changes to consumers of your library
+
+### Setup
+
+Add the BCV plugin to your root `build.gradle.kts` with `apply false` to make it available on the classpath:
+
+```kotlin
+plugins {
+    id("org.jetbrains.kotlinx.binary-compatibility-validator") version "<version>" apply false
+}
+```
+
+The convention plugins will automatically apply BCV to each library module. If BCV is not on the classpath, a warning is logged and ABI validation is skipped.
+
+### Tasks
+
+To generate or update the API dump files, run:
+
+```
+./gradlew apiDump
+```
+
+To check that the current public API matches the dump files, run:
+
+```
+./gradlew apiCheck
+```
+
+`apiCheck` is automatically wired into the `check` task, so it also runs as part of `./gradlew build`.
+
+API dump files are created in `{projectDir}/api/` with a `.api` file for each module.
+
+### Properties
+
+Auto-applying the plugin can be disabled by setting the following property to false in the `gradle.properties` file of the project:
+
+```
+kgp.plugins.autoapply.abivalidation=false
+```
+
+### Experimental Built-in Kotlin ABI Validation
+
+Kotlin 2.2+ includes an experimental built-in ABI validation feature. This can be enabled alongside BCV by setting the following property in `gradle.properties`:
+
+```
+kgp.plugins.autoapply.abivalidation.experimental=true
+```
+
+This is disabled by default. When enabled, it adds `checkLegacyAbi`, `dumpLegacyAbi`, and `updateLegacyAbi` tasks. Note that the built-in validation does not currently produce results for Android library projects.
 
 ## Dependency Guard
 

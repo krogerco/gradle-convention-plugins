@@ -35,6 +35,13 @@ internal class KgpProperties private constructor(private val project: Project) {
         get() = project.findOptionalBooleanProperty("kgp.plugins.autoapply.abivalidation") != false
 
     /**
+     * Whether to auto-apply the experimental built-in Kotlin ABI validation (Kotlin 2.2+). Default is false.
+     * This is separate from [autoApplyAbiValidation] which uses the stable Binary Compatibility Validator plugin.
+     */
+    val autoApplyExperimentalAbiValidation: Boolean
+        get() = project.findOptionalBooleanProperty("kgp.plugins.autoapply.abivalidation.experimental") ?: false
+
+    /**
      * Whether to auto-apply the Dependency Maintenance plugin to the root project. Default is true.
      */
     val autoApplyDependencyManagement: Boolean

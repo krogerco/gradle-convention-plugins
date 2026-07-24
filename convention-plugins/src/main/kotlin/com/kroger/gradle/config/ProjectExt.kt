@@ -41,14 +41,23 @@ import org.jmailen.gradle.kotlinter.KotlinterPlugin
 
 // region plugin configuration
 /**
- * When [isAbiValidationEnabled] is true, enables Kotlin's experimental built-in ABI validation (Kotlin 2.2+).
- * This is applied on individual Kotlin projects.
+ * Configures ABI validation for the project.
+ *
+ * When [isBcvEnabled] is true, applies the Binary Compatibility Validator plugin for stable ABI checking.
+ * When [isExperimentalEnabled] is true, also enables the built-in Kotlin ABI validation (Kotlin 2.2+).
  */
 @OptIn(ExperimentalAbiValidation::class)
-internal fun Project.configureAbiValidation(isAbiValidationEnabled: Boolean) {
-    if (isAbiValidationEnabled) {
+internal fun Project.configureAbiValidation(isBcvEnabled: Boolean, isExperimentalEnabled: Boolean) {
+    if (isBcvEnabled && !pluginManager.hasPlugin("org.jetbrains.kotlinx.binary-compatibility-validator")) {
+        try {
+            pluginManager.apply("org.jetbrains.kotlinx.binary-compatibility-validator")
+        } catch (_: org.gradle.api.plugins.UnknownPluginException) {
+            logger.warn("Binary Compatibility Validator plugin not found on classpath. Add 'org.jetbrains.kotlinx:binary-compatibility-validator' to enable ABI validation.")
+        }
+    }
+    if (isExperimentalEnabled) {
         kotlinExtension.configure<AbiValidationExtension> {
-            enabled.set(isAbiValidationEnabled)
+            enabled.set(true)
         }
     }
 }

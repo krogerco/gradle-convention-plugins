@@ -72,7 +72,7 @@ public class AndroidLibraryConventionPlugin : Plugin<Project> {
                     lint.targetSdk = kgpVersions.kgpTargetSdk
                 }
             }
-            configureAbiValidation(kgpProperties.autoApplyAbiValidation)
+            configureAbiValidation(kgpProperties.autoApplyAbiValidation, kgpProperties.autoApplyExperimentalAbiValidation)
         }
     }
 }

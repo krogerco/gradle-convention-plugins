@@ -236,6 +236,8 @@ class PublishedKotlinLibraryConventionPluginTest {
             .output
 
         output.shouldContainAll(
+            "apiCheck",
+            "apiDump",
             "checkLegacyAbi",
             "dumpLegacyAbi",
             "updateLegacyAbi",

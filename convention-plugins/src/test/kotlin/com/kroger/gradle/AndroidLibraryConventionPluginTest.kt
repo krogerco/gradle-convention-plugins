@@ -201,9 +201,8 @@ class AndroidLibraryConventionPluginTest {
             .output
 
         output.shouldContainAll(
-            "checkLegacyAbi",
-            "dumpLegacyAbi",
-            "updateLegacyAbi",
+            "apiCheck",
+            "apiDump",
         )
     }
 
