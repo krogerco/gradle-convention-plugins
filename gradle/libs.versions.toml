@@ -16,7 +16,7 @@ kotlin = "2.2.21"
 kotlinter = "5.4.2"
 koTest = "5.9.1"
 kover = "0.9.9"
-ksp = "2.2.21-2.0.5"
+ksp = "2.3.6"
 
 [libraries]
 androidx-lint-gradle = { module = "androidx.lint:lint-gradle", version.ref = "androidxLintGradle" }
