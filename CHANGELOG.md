@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - [Chore]: update ksp to 2.1.20-1.0.32
 - [Chore]: update maven publish plugin to 0.52.0
 - [Chore]: update room to 2.7.0
+- TODO no KAPT anymore
 
 ## 1.1.0
 

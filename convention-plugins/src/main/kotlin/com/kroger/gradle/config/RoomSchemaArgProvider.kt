@@ -31,21 +31,13 @@ import java.io.File
 
 /**
  * [CommandLineArgumentProvider] to configure location of generated schema files for room databases.
- * [isKsp] should be true for KSP support and false for KAPT support.
  */
 public class RoomSchemaArgProvider(
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
     public val schemaDir: File,
-    private val isKsp: Boolean = true,
 ) : CommandLineArgumentProvider {
     override fun asArguments(): Iterable<String> {
-        val argPrefix = if (isKsp) {
-            ""
-        } else {
-            "-A"
-        }
-
-        return listOf("${argPrefix}room.schemaLocation=${schemaDir.path}")
+        return listOf("room.schemaLocation=${schemaDir.path}")
     }
 }

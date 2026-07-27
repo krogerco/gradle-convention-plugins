@@ -65,9 +65,9 @@ class AndroidApplicationConventionPluginTest {
                     
                     afterEvaluate {
                         val hasHiltPlugin = pluginManager.hasPlugin("com.google.dagger.hilt.android")
-                        val hasKaptPlugin = pluginManager.hasPlugin("org.jetbrains.kotlin.kapt")
+                        val hasKspPlugin = pluginManager.hasPlugin("com.google.devtools.ksp")
                         println("hasHiltPlugin: ${"$"}hasHiltPlugin")
-                        println("hasKaptPlugin: ${"$"}hasKaptPlugin")
+                        println("hasKspPlugin: ${"$"}hasKspPlugin")
                     }
                     """.trimIndent(),
                 )
@@ -90,7 +90,7 @@ class AndroidApplicationConventionPluginTest {
             "koverHtmlReportDebug",
             // hilt configuration
             "hasHiltPlugin: true",
-            "hasKaptPlugin: true",
+            "hasKspPlugin: true",
         )
     }
 
@@ -108,7 +108,7 @@ class AndroidApplicationConventionPluginTest {
         output.shouldContainAll(
             // hilt configuration
             "hasHiltPlugin: false",
-            "hasKaptPlugin: false",
+            "hasKspPlugin: false",
         )
     }
 

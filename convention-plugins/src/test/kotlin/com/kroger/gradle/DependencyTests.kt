@@ -66,7 +66,6 @@ class DependencyTests {
             addSubproject("android-library-module") {
                 addPlugin("com.kroger.gradle.published-android-library-conventions")
                 addPlugin("com.android.library")
-                addPlugin("org.jetbrains.kotlin.kapt")
                 addPlugin("com.google.devtools.ksp")
                 appendBuildFile(
                     """
@@ -76,7 +75,7 @@ class DependencyTests {
 
                     afterEvaluate {
                         listOf("implementation", "debugImplementation", "androidTestImplementation", 
-                               "ksp", "kapt", "kaptTest", "kaptAndroidTest", "testImplementation", "testRuntimeOnly").forEach { configurationName ->
+                               "ksp", "kspTest", "kspAndroidTest", "testImplementation", "testRuntimeOnly").forEach { configurationName ->
                             configurations.named(configurationName).configure {
                                 println("CONFIGURATION NAME: ${"$"}name")
                                 dependencies.forEach { println("\t${"$"}name(${"$"}{it.group}:${"$"}{it.name}:${"$"}{it.version})") }
@@ -93,7 +92,7 @@ class DependencyTests {
                 )
                 withImportStatements {
                     add("import com.kroger.gradle.config.*")
-                    add("import com.android.build.gradle.LibraryExtension")
+                    add("import com.android.build.api.dsl.LibraryExtension")
                 }
             }
         }
@@ -133,24 +132,6 @@ class DependencyTests {
             "implementation(androidx.room:room-runtime:2.6.1)",
             "implementation(androidx.room:room-ktx:2.6.1)",
             "ksp(androidx.room:room-compiler:2.6.1)",
-            "Has room plugin = false",
-        )
-    }
-
-    @Test
-    fun `GIVEN roomKapt called THEN expected dependencies added`() {
-        testProjectBuilder.configureSubproject("android-library-module") {
-            appendBuildFile("roomKapt(layout.projectDirectory.dir(provider { \"schemas\" }), extensions.getByType(LibraryExtension::class))")
-        }
-        testProjectBuilder.build()
-        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
-            .build()
-            .output
-
-        output.shouldContainAll(
-            "implementation(androidx.room:room-runtime:2.6.1)",
-            "implementation(androidx.room:room-ktx:2.6.1)",
-            "kapt(androidx.room:room-compiler:2.6.1)",
             "Has room plugin = false",
         )
     }
@@ -236,47 +217,6 @@ class DependencyTests {
     }
 
     @Test
-    fun `GIVEN hilt called THEN expected dependencies added`() {
-        testProjectBuilder.configureSubproject("android-library-module") {
-            appendBuildFile("hilt()")
-        }
-        testProjectBuilder.build()
-        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
-            .build()
-            .output
-
-        output.shouldContainAll(
-            "implementation(javax.inject:javax.inject:1)",
-            "implementation(com.google.dagger:hilt-android:1.0.0)",
-            "kapt(com.google.dagger:hilt-android-compiler:1.0.0)",
-            "androidTestImplementation(com.google.dagger:hilt-android-testing:1.0.0)",
-        )
-
-        output.shouldNotContainAny(
-            "kapt(androidx.hilt:hilt-compiler:1.0.0)",
-        )
-    }
-
-    @Test
-    fun `GIVEN hilt called with all dependencies true THEN expected dependencies added`() {
-        testProjectBuilder.configureSubproject("android-library-module") {
-            appendBuildFile("hilt(androidxHiltCompiler = true)")
-        }
-        testProjectBuilder.build()
-        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
-            .build()
-            .output
-
-        output.shouldContainAll(
-            "implementation(javax.inject:javax.inject:1)",
-            "implementation(com.google.dagger:hilt-android:1.0.0)",
-            "kapt(com.google.dagger:hilt-android-compiler:1.0.0)",
-            "androidTestImplementation(com.google.dagger:hilt-android-testing:1.0.0)",
-            "kapt(androidx.hilt:hilt-compiler:1.0.0)",
-        )
-    }
-
-    @Test
     fun `GIVEN daggerKsp called THEN expected dependencies added`() {
         testProjectBuilder.configureSubproject("android-library-module") {
             appendBuildFile("daggerKsp()")
@@ -314,49 +254,6 @@ class DependencyTests {
             "implementation(javax.inject:javax.inject:1)",
             "ksp(com.google.dagger:dagger-compiler:1.0.0)",
             "ksp(com.google.dagger:dagger-android-processor:1.0.0)",
-            "implementation(com.google.dagger:dagger-android:1.0.0)",
-            "implementation(com.google.dagger:dagger-android-support:1.0.0)",
-        )
-    }
-
-    @Test
-    fun `GIVEN dagger called THEN expected dependencies added`() {
-        testProjectBuilder.configureSubproject("android-library-module") {
-            appendBuildFile("dagger()")
-        }
-        testProjectBuilder.build()
-        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
-            .build()
-            .output
-
-        output.shouldContainAll(
-            "implementation(com.google.dagger:dagger:1.0.0)",
-            "implementation(javax.inject:javax.inject:1)",
-            "kapt(com.google.dagger:dagger-compiler:1.0.0)",
-        )
-
-        output.shouldNotContainAny(
-            "kapt(com.google.dagger:dagger-android-processor:1.0.0)",
-            "implementation(com.google.dagger:dagger-android:1.0.0)",
-            "implementation(com.google.dagger:dagger-android-support:1.0.0)",
-        )
-    }
-
-    @Test
-    fun `GIVEN dagger called with all dependencies true THEN expected dependencies added`() {
-        testProjectBuilder.configureSubproject("android-library-module") {
-            appendBuildFile("dagger(daggerAndroid = true, daggerAndroidSupport = true)")
-        }
-        testProjectBuilder.build()
-        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
-            .build()
-            .output
-
-        output.shouldContainAll(
-            "implementation(com.google.dagger:dagger:1.0.0)",
-            "implementation(javax.inject:javax.inject:1)",
-            "kapt(com.google.dagger:dagger-compiler:1.0.0)",
-            "kapt(com.google.dagger:dagger-android-processor:1.0.0)",
             "implementation(com.google.dagger:dagger-android:1.0.0)",
             "implementation(com.google.dagger:dagger-android-support:1.0.0)",
         )
