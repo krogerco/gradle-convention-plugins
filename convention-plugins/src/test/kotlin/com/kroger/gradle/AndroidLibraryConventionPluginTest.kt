@@ -193,6 +193,20 @@ class AndroidLibraryConventionPluginTest {
     }
 
     @Test
+    fun `WHEN android library plugin applied THEN ABI validation tasks exist`() {
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, arguments = arrayOf(":android-library:tasks", "--all"))
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "apiCheck",
+            "apiDump",
+        )
+    }
+
+    @Test
     fun `GIVEN android library plugin applied WHEN version catalog missing THEN error occurs`() {
         rootProject(projectDir = testProjectDir) {
             addPlugin("com.kroger.gradle.android-library-conventions", "", true)

@@ -1,5 +1,6 @@
 [versions]
 androidGradlePlugin = "8.10.0"
+binaryCompatibilityValidator = "0.18.1"
 androidJunit5Plugin = "1.12.0.0"
 androidxLintGradle = "1.0.0-alpha03"
 androidxRoom = "2.7.0"
@@ -12,11 +13,11 @@ gradleMavenPublishPlugin = "0.35.0" # any further upgrade requires Gradle 9
 gradleVersionsPlugin = "0.52.0"
 hilt = "2.56.2"
 junitBom = "5.12.0"
-kotlin = "2.1.20"
+kotlin = "2.2.21"
 kotlinter = "5.0.2"
 koTest = "5.9.1"
 kover = "0.9.1"
-ksp = "2.1.20-1.0.32"
+ksp = "2.2.21-2.0.5"
 
 [libraries]
 androidx-lint-gradle = { module = "androidx.lint:lint-gradle", version.ref = "androidxLintGradle" }
@@ -29,6 +30,7 @@ koTest = { module = "io.kotest:kotest-assertions-core", version.ref = "koTest" }
 
 # plugins for classpath (usually not necessary but are for conventional precompiled gradle plugin usage)
 gradlePlugins-androidJunit5 = { module = "de.mannodermaus.gradle.plugins:android-junit5", version.ref = "androidJunit5Plugin" }
+gradlePlugins-binaryCompatibilityValidator = { module = "org.jetbrains.kotlinx:binary-compatibility-validator", version.ref = "binaryCompatibilityValidator" }
 gradlePlugins-android = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
 gradlePlugins-catalogVersions = { module = "nl.littlerobots.version-catalog-update:nl.littlerobots.version-catalog-update.gradle.plugin", version.ref = "catalogVersionsPlugin" }
 gradlePlugins-compose = { module = "org.jetbrains.kotlin.plugin.compose:org.jetbrains.kotlin.plugin.compose.gradle.plugin", version.ref = "kotlin" }

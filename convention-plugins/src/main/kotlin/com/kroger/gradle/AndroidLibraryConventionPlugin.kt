@@ -28,6 +28,7 @@ import com.android.build.api.dsl.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.kroger.gradle.config.KgpProperties
 import com.kroger.gradle.config.MIN_SUPPORTED_AGP_VERSION
+import com.kroger.gradle.config.configureAbiValidation
 import com.kroger.gradle.config.configureDependencyGuard
 import com.kroger.gradle.config.configureDokka
 import com.kroger.gradle.config.configureHilt
@@ -71,6 +72,7 @@ public class AndroidLibraryConventionPlugin : Plugin<Project> {
                     lint.targetSdk = kgpVersions.kgpTargetSdk
                 }
             }
+            configureAbiValidation(kgpProperties.autoApplyAbiValidation, kgpProperties.autoApplyExperimentalAbiValidation)
         }
     }
 }

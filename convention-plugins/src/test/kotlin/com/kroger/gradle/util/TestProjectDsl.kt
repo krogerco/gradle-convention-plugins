@@ -253,4 +253,4 @@ fun gradleRunner(projectDir: File, vararg arguments: String): GradleRunner =
         .withPluginClasspath()
 
 const val JDK_VERSION: String = "17"
-const val KOTLIN_VERSION: String = "2.1.20"
+const val KOTLIN_VERSION: String = "2.2.21"

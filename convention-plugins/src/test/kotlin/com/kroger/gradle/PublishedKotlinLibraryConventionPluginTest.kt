@@ -223,4 +223,38 @@ class PublishedKotlinLibraryConventionPluginTest {
 
         output.shouldContain("Dependency Guard tasks")
     }
+
+    @Test
+    fun `WHEN ABI validation enabled THEN ABI validation tasks exist`() {
+        testProjectBuilder.withProperties {
+            put("kgp.plugins.autoapply.abivalidation", "true")
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, arguments = arrayOf(":kotlin-module:tasks", "--all"))
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "apiCheck",
+            "apiDump",
+            "checkLegacyAbi",
+            "dumpLegacyAbi",
+            "updateLegacyAbi",
+        )
+    }
+
+    @Test
+    fun `WHEN ABI validation disabled THEN build succeeds without ABI validation configured`() {
+        testProjectBuilder.withProperties {
+            put("kgp.plugins.autoapply.abivalidation", "false")
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, arguments = arrayOf(":kotlin-module:tasks"))
+            .build()
+            .output
+
+        output.shouldContain("BUILD SUCCESSFUL")
+    }
 }

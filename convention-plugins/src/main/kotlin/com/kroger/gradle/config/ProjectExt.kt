@@ -29,13 +29,39 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.DokkaPlugin
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationExtension
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
+import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jmailen.gradle.kotlinter.KotlinterPlugin
 
 // region plugin configuration
+/**
+ * Configures ABI validation for the project.
+ *
+ * When [isBcvEnabled] is true, applies the Binary Compatibility Validator plugin for stable ABI checking.
+ * When [isExperimentalEnabled] is true, also enables the built-in Kotlin ABI validation (Kotlin 2.2+).
+ */
+@OptIn(ExperimentalAbiValidation::class)
+internal fun Project.configureAbiValidation(isBcvEnabled: Boolean, isExperimentalEnabled: Boolean) {
+    if (isBcvEnabled && !pluginManager.hasPlugin("org.jetbrains.kotlinx.binary-compatibility-validator")) {
+        try {
+            pluginManager.apply("org.jetbrains.kotlinx.binary-compatibility-validator")
+        } catch (_: org.gradle.api.plugins.UnknownPluginException) {
+            logger.warn("Binary Compatibility Validator plugin not found on classpath. Add 'org.jetbrains.kotlinx:binary-compatibility-validator' to enable ABI validation.")
+        }
+    }
+    if (isExperimentalEnabled) {
+        kotlinExtension.configure<AbiValidationExtension> {
+            enabled.set(true)
+        }
+    }
+}
+
 /**
  * When [isDependencyGuardEnabled] is true, adds the DependencyGuard plugin.
  */
