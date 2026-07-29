@@ -51,6 +51,7 @@ public class AndroidLibraryConventionPlugin : Plugin<Project> {
         }
 
         val kgpProperties = KgpProperties(target)
+        val kgpVersions = kgpProperties.kgpVersions
         with(target) {
             with(pluginManager) {
                 apply(LibraryPlugin::class.java)
@@ -65,6 +66,10 @@ public class AndroidLibraryConventionPlugin : Plugin<Project> {
 
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this, kgpProperties, ExplicitApiMode.Strict)
+                defaultConfig {
+                    testOptions.targetSdk = kgpVersions.kgpTargetSdk
+                    lint.targetSdk = kgpVersions.kgpTargetSdk
+                }
             }
         }
     }
