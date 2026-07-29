@@ -52,7 +52,7 @@ The following versions are required in the version catalog:
 The following versions are required in the version catalog when using Android convention plugins:
 - **kgpCompileSdk**: The SDK version the application compiles against.
 - **kgpMinSdk**: The minimum API level required to run the application.
-- **kgpTargetSdk**: The API level the application targets.
+- **kgpTargetSdk**: The API level the application targets. For applications this sets `defaultConfig.targetSdk`. For libraries this sets `testOptions.targetSdk` and `lint.targetSdk`.
 - **kgpDokka**: The version used for the Android Documentation Plugin dependency.
 
 # Plugins
