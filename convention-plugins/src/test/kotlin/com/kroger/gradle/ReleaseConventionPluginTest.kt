@@ -43,9 +43,6 @@ class ReleaseConventionPluginTest {
     @BeforeEach
     fun setup() {
         testProjectBuilder = rootProject(projectDir = testProjectDir) {
-            withProperties {
-                put("org.jetbrains.dokka.experimental.gradle.pluginMode", "V2EnabledWithHelpers")
-            }
             versionCatalogSpec.versions.apply {
                 put("kgpKotlin", "\"$KOTLIN_VERSION\"")
                 put("kgpJdk", "\"$JDK_VERSION\"")

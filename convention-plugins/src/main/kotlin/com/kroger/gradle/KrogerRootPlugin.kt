@@ -48,6 +48,12 @@ public class KrogerRootPlugin : Plugin<Project> {
         }
 
         with(target) {
+            // Auto-enable Dokka v2 if not explicitly set
+            val dokkaPluginModeProperty = "org.jetbrains.dokka.experimental.gradle.pluginMode"
+            if (!hasProperty(dokkaPluginModeProperty)) {
+                extensions.extraProperties.set(dokkaPluginModeProperty, "V2Enabled")
+            }
+
             pluginManager.apply(BasePlugin::class.java)
 
             val kgpProperties = KgpProperties(this)

@@ -56,9 +56,6 @@ class AndroidLibraryConventionPluginTest {
             }
             addPlugin("com.kroger.gradle.root")
             addPlugin("com.kroger.gradle.android-library-conventions", apply = false)
-            withProperties {
-                put("org.jetbrains.dokka.experimental.gradle.pluginMode", "V2EnabledWithHelpers")
-            }
             addSubproject("android-library") {
                 addPlugin("com.kroger.gradle.android-library-conventions")
                 appendBuildFile(

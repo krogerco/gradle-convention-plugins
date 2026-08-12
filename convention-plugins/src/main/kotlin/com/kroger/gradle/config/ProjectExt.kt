@@ -93,10 +93,8 @@ internal fun Project.configureDependencyGuard(isDependencyGuardEnabled: Boolean,
 /**
  * When [isDokkaEnabled] is true, adds the Dokka plugin.
  *
- * Requires Dokka v2 mode to be enabled in gradle.properties:
- * ```
- * org.jetbrains.dokka.experimental.gradle.pluginMode=V2EnabledWithHelpers
- * ```
+ * Note: The KrogerRootPlugin automatically enables Dokka v2 mode (V2Enabled).
+ * Consumers can override this in gradle.properties if needed (e.g., V2EnabledWithHelpers for migration).
  *
  * @param isAndroidProject when true adds the android documentation plugin dependency
  */

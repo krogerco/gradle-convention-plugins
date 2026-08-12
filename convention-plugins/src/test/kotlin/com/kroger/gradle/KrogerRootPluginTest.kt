@@ -46,9 +46,6 @@ class KrogerRootPluginTest {
         testProjectBuilder = rootProject(projectDir = testProjectDir) {
             versionCatalogSpec.versions["kgpKotlin"] = "\"$KOTLIN_VERSION\""
             addPlugin("com.kroger.gradle.root", "", true)
-            withProperties {
-                put("org.jetbrains.dokka.experimental.gradle.pluginMode", "V2EnabledWithHelpers")
-            }
         }
     }
 

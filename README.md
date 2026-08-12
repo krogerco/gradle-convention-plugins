@@ -70,13 +70,16 @@ kgp.plugins.autoapply.kover=false
 ```
 
 ### Dokka v2 Requirement
-**IMPORTANT:** The convention plugins require [Dokka Gradle Plugin v2](https://kotl.in/dokka-gradle-migration) to be enabled. Add the following property to your project's `gradle.properties` file:
+The convention plugins automatically enable [Dokka Gradle Plugin v2](https://kotl.in/dokka-gradle-migration) by setting `org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled`. No additional configuration is required.
+
+If you're migrating from Dokka v1 and want migration helpers and warnings, you can override this in your project's `gradle.properties`:
 
 ```properties
+# Optional: Enable migration helpers if migrating from Dokka v1
 org.jetbrains.dokka.experimental.gradle.pluginMode=V2EnabledWithHelpers
 ```
 
-Without this property, the build will fail with an error about `DokkaExtension` not existing. Once you have finished migrating and verified everything works, you can change the value to `V2Enabled` to disable the migration helpers.
+Once migration is complete, remove this property to use the default `V2Enabled` mode without helpers.
 
 ### Dokka Documentation Aggregation
 The root plugin automatically aggregates documentation from all subprojects that have the Dokka plugin applied. For aggregation to work:
