@@ -57,6 +57,9 @@ class PublishedAndroidLibraryConventionPluginTest {
             }
             addPlugin("com.kroger.gradle.root")
             addPlugin("com.kroger.gradle.published-android-library-conventions", apply = false)
+            withProperties {
+                put("org.jetbrains.dokka.experimental.gradle.pluginMode", "V2EnabledWithHelpers")
+            }
             addSubproject("android-library-module") {
                 addPlugin("com.kroger.gradle.published-android-library-conventions")
                 appendBuildFile(
@@ -64,7 +67,7 @@ class PublishedAndroidLibraryConventionPluginTest {
                     android {
                         namespace = "com.kroger.kgp.testmodule"
                     }
-     
+
                     afterEvaluate {
                         val hasHiltPlugin = pluginManager.hasPlugin("com.google.dagger.hilt.android")
                         val hasKaptPlugin = pluginManager.hasPlugin("org.jetbrains.kotlin.kapt")
@@ -99,7 +102,7 @@ class PublishedAndroidLibraryConventionPluginTest {
         output.shouldContainAll(
             // default tasks
             "assemble - ",
-            "dokkaHtml - ",
+            "dokkaGenerate - ",
             "installDebugAndroidTest - ",
             "koverHtmlReportDebug",
             "lintKotlin - ",

@@ -44,6 +44,9 @@ class ConfigureComposeTest {
     @BeforeEach
     fun init() {
         testProjectBuilder = rootProject(projectDir = testProjectDir) {
+            withProperties {
+                put("org.jetbrains.dokka.experimental.gradle.pluginMode", "V2EnabledWithHelpers")
+            }
             versionCatalogSpec.apply {
                 versions.apply {
                     put("kgpAndroidxComposeBom", "\"2022.12.00\"")

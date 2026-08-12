@@ -32,6 +32,7 @@ public object Configurations {
     public const val API: String = "api"
     public const val CORE_LIBRARY_DESUGARING: String = "coreLibraryDesugaring"
     public const val DEBUG_IMPLEMENTATION: String = "debugImplementation"
+    public const val DOKKA: String = "dokka"
     public const val DOKKA_PLUGIN: String = "dokkaPlugin"
     public const val IMPLEMENTATION: String = "implementation"
     public const val KAPT: String = "kapt"

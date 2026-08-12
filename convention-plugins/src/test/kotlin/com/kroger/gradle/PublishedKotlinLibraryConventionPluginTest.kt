@@ -51,6 +51,9 @@ class PublishedKotlinLibraryConventionPluginTest {
             }
             addPlugin("com.kroger.gradle.root")
             addPlugin("com.kroger.gradle.published-kotlin-library-conventions", apply = false)
+            withProperties {
+                put("org.jetbrains.dokka.experimental.gradle.pluginMode", "V2EnabledWithHelpers")
+            }
             addSubproject("kotlin-module") {
                 addPlugin("com.kroger.gradle.published-kotlin-library-conventions")
             }
@@ -79,7 +82,7 @@ class PublishedKotlinLibraryConventionPluginTest {
         output.shouldContainAll(
             "assemble - ",
             "lintKotlin - ",
-            "dokkaHtml - ",
+            "dokkaGenerate - ",
             "koverHtmlReport",
             "publishMavenPublicationToArtifactoryRepository - ",
         )
