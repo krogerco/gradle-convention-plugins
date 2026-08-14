@@ -31,9 +31,8 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.withType
+import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.dokka.gradle.DokkaPlugin
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationExtension
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
@@ -93,14 +92,23 @@ internal fun Project.configureDependencyGuard(isDependencyGuardEnabled: Boolean,
 
 /**
  * When [isDokkaEnabled] is true, adds the Dokka plugin.
+ *
+ * Note: The KrogerRootPlugin automatically enables Dokka v2 mode (V2Enabled).
+ * Consumers can override this in gradle.properties if needed (e.g., V2EnabledWithHelpers for migration).
+ *
  * @param isAndroidProject when true adds the android documentation plugin dependency
  */
 internal fun Project.configureDokka(isDokkaEnabled: Boolean, isAndroidProject: Boolean = false) {
     if (isDokkaEnabled) {
         pluginManager.apply(DokkaPlugin::class.java)
-        tasks.withType<DokkaTask>().configureEach {
-            dokkaSourceSets.configureEach {
-                offlineMode.set(true)
+
+        // Configure Dokka v2 extension after plugin is applied
+        pluginManager.withPlugin("org.jetbrains.dokka") {
+            extensions.configure<DokkaExtension> {
+                // Configure all publications to use offline mode
+                dokkaPublications.configureEach {
+                    offlineMode.set(true)
+                }
             }
         }
 

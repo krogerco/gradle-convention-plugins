@@ -69,6 +69,32 @@ kgp.plugins.autoapply.kotlinter=false
 kgp.plugins.autoapply.kover=false
 ```
 
+### Dokka v2 Requirement
+The convention plugins automatically enable [Dokka Gradle Plugin v2](https://kotl.in/dokka-gradle-migration) by setting `org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled`. No additional configuration is required.
+
+If you're migrating from Dokka v1 and want migration helpers and warnings, you can override this in your project's `gradle.properties`:
+
+```properties
+# Optional: Enable migration helpers if migrating from Dokka v1
+org.jetbrains.dokka.experimental.gradle.pluginMode=V2EnabledWithHelpers
+```
+
+Once migration is complete, remove this property to use the default `V2Enabled` mode without helpers.
+
+### Dokka Documentation Aggregation
+The root plugin automatically aggregates documentation from all subprojects that have the Dokka plugin applied. For aggregation to work:
+
+1. Ensure `kgp.plugins.autoapply.dokka=true` in your `gradle.properties` (default is true)
+2. Apply one of these convention plugins to your subprojects:
+   - `com.kroger.gradle.published-android-library-conventions`
+   - `com.kroger.gradle.published-kotlin-library-conventions`
+   - `com.kroger.gradle.android-library-conventions`
+   - `com.kroger.gradle.kotlin-library-conventions`
+
+When subprojects have Dokka enabled, the root project's `dokkaGeneratePublicationHtml` task will generate aggregated documentation in `build/dokka/html/` that includes all subproject documentation.
+
+If you see the message "Dokka: No subprojects with Dokka plugin found", it means none of your subprojects have Dokka enabled through the convention plugins above.
+
 ## KGP Root Plugin
 A plugin that only gets applied to the root project in a multi-project build. It applies common configuration to the root project and subprojects including:
 - Creating a clean task to delete the build directory of the root project.

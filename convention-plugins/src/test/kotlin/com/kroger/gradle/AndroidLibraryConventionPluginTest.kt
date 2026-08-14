@@ -90,7 +90,7 @@ class AndroidLibraryConventionPluginTest {
             "lintKotlin - ",
             "koverHtmlReportDebug",
             "installDebugAndroidTest - ",
-            "dokkaHtml - ",
+            "dokkaGenerate - ",
             // hilt configuration
             "hasHiltPlugin: false",
             "hasKaptPlugin: false",

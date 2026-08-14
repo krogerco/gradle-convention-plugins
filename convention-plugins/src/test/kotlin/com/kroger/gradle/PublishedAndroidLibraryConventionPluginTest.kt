@@ -64,7 +64,7 @@ class PublishedAndroidLibraryConventionPluginTest {
                     android {
                         namespace = "com.kroger.kgp.testmodule"
                     }
-     
+
                     afterEvaluate {
                         val hasHiltPlugin = pluginManager.hasPlugin("com.google.dagger.hilt.android")
                         val hasKaptPlugin = pluginManager.hasPlugin("org.jetbrains.kotlin.kapt")
@@ -99,7 +99,7 @@ class PublishedAndroidLibraryConventionPluginTest {
         output.shouldContainAll(
             // default tasks
             "assemble - ",
-            "dokkaHtml - ",
+            "dokkaGenerate - ",
             "installDebugAndroidTest - ",
             "koverHtmlReportDebug",
             "lintKotlin - ",

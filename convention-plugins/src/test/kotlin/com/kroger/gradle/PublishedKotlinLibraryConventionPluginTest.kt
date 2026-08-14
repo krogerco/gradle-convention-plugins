@@ -79,7 +79,7 @@ class PublishedKotlinLibraryConventionPluginTest {
         output.shouldContainAll(
             "assemble - ",
             "lintKotlin - ",
-            "dokkaHtml - ",
+            "dokkaGenerate - ",
             "koverHtmlReport",
             "publishMavenPublicationToArtifactoryRepository - ",
         )
