@@ -251,6 +251,10 @@ fun gradleRunner(projectDir: File, vararg arguments: String): GradleRunner =
         .withArguments(*arguments)
         .withProjectDir(projectDir)
         .withPluginClasspath()
+        .withDebug(RUN_TESTS_IN_DEBUG)
 
 const val JDK_VERSION: String = "17"
 const val KOTLIN_VERSION: String = "2.2.21"
+
+/* Set this to true when debugging unit tests that use the `gradleRunner()` method */
+const val RUN_TESTS_IN_DEBUG: Boolean = false
