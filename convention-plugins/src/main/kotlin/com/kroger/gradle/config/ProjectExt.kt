@@ -34,9 +34,12 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.dokka.gradle.DokkaPlugin
+import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationExtension
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
+import org.jetbrains.kotlin.gradle.plugin.KotlinBaseApiPlugin
 import org.jmailen.gradle.kotlinter.KotlinterPlugin
 
 // region plugin configuration
@@ -150,6 +153,27 @@ internal fun Project.configureKover(isKoverEnabled: Boolean) {
     }
 }
 // endregion
+
+// region Built-in Kotlin detection
+
+/**
+ * Determines if AGP's built-in Kotlin is enabled. Built-in Kotlin applies the `KotlinBaseApiPlugin` and does not apply
+ * the Kotlin Android plugin.
+ */
+internal fun Project.isAgpBuiltInKotlinUsed(): Boolean =
+    plugins.findPlugin(KotlinBaseApiPlugin::class.java) != null
+            && !pluginManager.hasPlugin("org.jetbrains.kotlin.android")
+
+// endregion
+
+/**
+ * Conditionally applies the Kotlin Android plugin based on AGP's built-in Kotlin setting.
+ */
+internal fun Project.applyKotlinAndroidPluginIfNeeded() {
+    if (!isAgpBuiltInKotlinUsed()) {
+        pluginManager.apply(KotlinAndroidPluginWrapper::class.java)
+    }
+}
 
 /**
  * Returns the value of the BUILD_VERSION environment variable

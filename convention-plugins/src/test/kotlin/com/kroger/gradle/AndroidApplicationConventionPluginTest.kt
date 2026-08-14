@@ -44,13 +44,14 @@ class AndroidApplicationConventionPluginTest {
     fun init() {
         testProjectBuilder = rootProject(projectDir = testProjectDir) {
             versionCatalogSpec.versions.apply {
-                put("kgpAndroidxComposeBom", "\"2022-12-00\"")
-                put("kgpCompileSdk", "\"32\"")
-                put("kgpDagger", "\"32\"")
+                put("kgpAndroidxComposeBom", "\"2026-08-00\"")
+                put("kgpCompileSdk", "\"37\"")
+                put("kgpDokka", "\"2.0.0\"")
                 put("kgpKotlin", "\"$KOTLIN_VERSION\"")
                 put("kgpJdk", "\"$JDK_VERSION\"")
                 put("kgpMinSdk", "\"26\"")
-                put("kgpTargetSdk", "\"26\"")
+                put("kgpDagger", "\"2.59.2\"")
+                put("kgpTargetSdk", "\"37\"")
             }
             addPlugin("com.kroger.gradle.root")
             addPlugin("com.kroger.gradle.android-application-conventions", apply = false)
@@ -58,7 +59,7 @@ class AndroidApplicationConventionPluginTest {
                 addPlugin("com.kroger.gradle.android-application-conventions")
                 addPlugin("org.jetbrains.kotlin.plugin.compose")
                 appendBuildFile(
-                    """
+                    $$"""
                     android {
                         namespace = "com.kroger.kgp.testapp"
                     }
@@ -66,8 +67,12 @@ class AndroidApplicationConventionPluginTest {
                     afterEvaluate {
                         val hasHiltPlugin = pluginManager.hasPlugin("com.google.dagger.hilt.android")
                         val hasKspPlugin = pluginManager.hasPlugin("com.google.devtools.ksp")
-                        println("hasHiltPlugin: ${"$"}hasHiltPlugin")
-                        println("hasKspPlugin: ${"$"}hasKspPlugin")
+                        val hasKotlinAndroidPlugin = pluginManager.hasPlugin("org.jetbrains.kotlin.android")
+                        val hasKotlinBaseApiPlugin = plugins.findPlugin(org.jetbrains.kotlin.gradle.plugin.KotlinBaseApiPlugin::class.java) != null
+                        println("hasHiltPlugin: $hasHiltPlugin")
+                        println("hasKspPlugin: $hasKspPlugin")
+                        println("hasKotlinAndroidPlugin: $hasKotlinAndroidPlugin")
+                        println("hasKotlinBaseApiPlugin: $hasKotlinBaseApiPlugin")
                     }
                     """.trimIndent(),
                 )
@@ -124,5 +129,39 @@ class AndroidApplicationConventionPluginTest {
             .output
 
         output.shouldNotContain("kover")
+    }
+
+    @Test
+    fun `WHEN android application plugin applied with built-in Kotlin enabled THEN Kotlin is available via KotlinBaseApiPlugin`() {
+        // Built-in Kotlin is enabled by default in AGP 9
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":android-app:tasks")
+            .build()
+            .output
+
+        // With built-in Kotlin enabled, AGP applies KotlinBaseApiPlugin but not the standalone Kotlin Android plugin
+        output.shouldContainAll(
+            "hasKotlinBaseApiPlugin: true",
+            "hasKotlinAndroidPlugin: false",
+        )
+    }
+
+    @Test
+    fun `WHEN android application plugin applied with built-in Kotlin disabled THEN Kotlin Android plugin is explicitly applied`() {
+        testProjectBuilder.withProperties {
+            put("android.builtInKotlin", "false")
+            put("android.newDsl", "false")
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":android-app:tasks")
+            .build()
+            .output
+
+        // With built-in Kotlin disabled, our plugin should explicitly apply the Kotlin Android plugin
+        output.shouldContainAll(
+            "hasKotlinAndroidPlugin: true",
+        )
     }
 }

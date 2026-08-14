@@ -30,6 +30,7 @@ import com.android.build.gradle.AppPlugin
 import com.kroger.gradle.config.KgpProperties
 import com.kroger.gradle.config.MIN_SUPPORTED_AGP_VERSION
 import com.kroger.gradle.config.configureHilt
+import com.kroger.gradle.config.applyKotlinAndroidPluginIfNeeded
 import com.kroger.gradle.config.configureKotlinAndroid
 import com.kroger.gradle.config.configureKotlinter
 import com.kroger.gradle.config.configureKover
@@ -37,7 +38,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
-import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
 
 /**
  * Apply conventions common to Android applications.
@@ -53,6 +53,7 @@ public class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply(AppPlugin::class.java)
+                applyKotlinAndroidPluginIfNeeded()
                 configureHilt(kgpProperties.autoConfigureHiltApplication)
                 configureKover(kgpProperties.autoApplyKover)
                 configureKotlinter(kgpProperties.autoApplyKotlinter)

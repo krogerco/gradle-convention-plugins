@@ -30,6 +30,7 @@ import com.kroger.gradle.config.KgpProperties
 import com.kroger.gradle.config.MIN_SUPPORTED_AGP_VERSION
 import com.kroger.gradle.config.configureAbiValidation
 import com.kroger.gradle.config.configureDependencyGuard
+import com.kroger.gradle.config.applyKotlinAndroidPluginIfNeeded
 import com.kroger.gradle.config.configureDokka
 import com.kroger.gradle.config.configureHilt
 import com.kroger.gradle.config.configureKotlinAndroid
@@ -40,7 +41,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
-import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
 
 /**
  * Apply conventions common to Android libraries.
@@ -56,6 +56,7 @@ public class AndroidLibraryConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply(LibraryPlugin::class.java)
+                applyKotlinAndroidPluginIfNeeded()
                 apply(AndroidJUnitPlatformPlugin::class.java)
                 configureDependencyGuard(kgpProperties.autoApplyDependencyGuard, isAndroidProject = true)
                 configureDokka(kgpProperties.autoApplyDokka, true)
