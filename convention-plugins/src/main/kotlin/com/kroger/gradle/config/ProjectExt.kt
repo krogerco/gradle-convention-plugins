@@ -34,7 +34,6 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.dokka.gradle.DokkaPlugin
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationExtension
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
@@ -157,11 +156,11 @@ internal fun Project.configureKover(isKoverEnabled: Boolean) {
 // region Built-in Kotlin detection
 
 /**
- * Determines if AGP's built-in Kotlin is enabled. Built-in Kotlin applies the `KotlinBaseApiPlugin` and does not apply
- * the Kotlin Android plugin.
+ * Determines if AGP's built-in Kotlin is enabled. Built-in Kotlin applies `KotlinBaseApiPlugin` or a subclass and
+ * does not apply the Kotlin Android plugin.
  */
 internal fun Project.isAgpBuiltInKotlinUsed(): Boolean =
-    plugins.findPlugin(KotlinBaseApiPlugin::class.java) != null
+    plugins.withType(KotlinBaseApiPlugin::class.java).any()
             && !pluginManager.hasPlugin("org.jetbrains.kotlin.android")
 
 // endregion
