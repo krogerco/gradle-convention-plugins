@@ -1,7 +1,8 @@
 [versions]
 androidGradlePlugin = "9.0.1"
 androidJunitFramework = "2.0.1"
-binaryCompatibilityValidator = "0.18.1"
+androidBcvBridge = "0.2.0"
+binaryCompatibilityValidator = "0.18.1" # This version is important to androidBcvBridge; change them together
 androidxLintGradle = "1.0.0-alpha03"
 androidxRoom = "2.7.0"
 catalogVersionsPlugin = "0.8.5"
@@ -27,6 +28,7 @@ jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 
 koTest = { module = "io.kotest:kotest-assertions-core", version.ref = "koTest" }
 
+gradlePlugins-androidBcvBridge = { module = "io.github.tjokinen.android-bcv-bridge:io.github.tjokinen.android-bcv-bridge.gradle.plugin", version.ref = "androidBcvBridge" }
 gradlePlugins-androidJunitFramework = { module = "de.mannodermaus.gradle.plugins:android-junit5", version.ref = "androidJunitFramework" }
 gradlePlugins-binaryCompatibilityValidator = { module = "org.jetbrains.kotlinx:binary-compatibility-validator", version.ref = "binaryCompatibilityValidator" }
 gradlePlugins-android = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }

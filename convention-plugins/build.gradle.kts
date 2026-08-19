@@ -111,6 +111,7 @@ gradlePlugin {
 
 dependencies {
     compileOnly(libs.gradlePlugins.android)
+    compileOnly(libs.gradlePlugins.androidBcvBridge)
     compileOnly(libs.gradlePlugins.androidJunitFramework)
     compileOnly(libs.gradlePlugins.binaryCompatibilityValidator)
     compileOnly(libs.gradlePlugins.compose)

@@ -28,15 +28,17 @@ import com.android.build.api.dsl.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.kroger.gradle.config.KgpProperties
 import com.kroger.gradle.config.MIN_SUPPORTED_AGP_VERSION
+import com.kroger.gradle.config.applyKotlinAndroidPluginIfNeeded
 import com.kroger.gradle.config.configureAbiValidation
 import com.kroger.gradle.config.configureDependencyGuard
-import com.kroger.gradle.config.applyKotlinAndroidPluginIfNeeded
 import com.kroger.gradle.config.configureDokka
 import com.kroger.gradle.config.configureHilt
 import com.kroger.gradle.config.configureKotlinAndroid
 import com.kroger.gradle.config.configureKotlinter
 import com.kroger.gradle.config.configureKover
+import com.kroger.gradle.config.isAgpBuiltInKotlinUsed
 import de.mannodermaus.gradle.plugins.junit5.AndroidJUnitPlatformPlugin
+import io.github.tjokinen.androidbcvbridge.AndroidBcvBridgePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -72,7 +74,12 @@ public class AndroidLibraryConventionPlugin : Plugin<Project> {
                     lint.targetSdk = kgpVersions.kgpTargetSdk
                 }
             }
-            configureAbiValidation(kgpProperties.autoApplyAbiValidation, kgpProperties.autoApplyExperimentalAbiValidation)
+
+            if (isAgpBuiltInKotlinUsed()) {/* This bridge applies and configures ABI validation in a way that works for built in kotlin, note that the tasks will be named releaseApiCheck and releaseApiDump */
+                pluginManager.apply(AndroidBcvBridgePlugin::class.java)
+            } else {
+                configureAbiValidation(kgpProperties.autoApplyAbiValidation, kgpProperties.autoApplyExperimentalAbiValidation)
+            }
         }
     }
 }

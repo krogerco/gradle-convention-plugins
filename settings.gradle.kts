@@ -39,6 +39,8 @@ dependencyResolutionManagement {
         gradlePluginPortal {
             content {
                 includeModule("com.github.ben-manes", "gradle-versions-plugin")
+                includeModule("io.github.tjokinen.android-bcv-bridge", "io.github.tjokinen.android-bcv-bridge.gradle.plugin")
+                includeModule("io.github.tjokinen", "android-bcv-bridge")
                 includeModule("org.gradle.toolchains", "foojay-resolver")
                 includeModule("org.jmailen.gradle", "kotlinter-gradle")
             }
