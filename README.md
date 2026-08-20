@@ -1,7 +1,6 @@
 # Gradle Convention Plugins
 
 A collection of convention plugins to consistently configure Android applications and libraries.
-The plugins require Gradle 8.11.1+ and Android Gradle Plugin 8.9.1+ for Android projects.
 
 - [Installation](#installation)
   - [Version Catalog Requirements](#version-catalog-requirements)
@@ -30,9 +29,10 @@ The plugins require Gradle 8.11.1+ and Android Gradle Plugin 8.9.1+ for Android 
 
 # Installation
 
-All plugins are published to [Maven Central](https://central.sonatype.com/). To use the plugins add the following repository to `settings.gradle.kts` under `pluginManagement`:
+All plugins are published to [Maven Central](https://central.sonatype.com/). To use the plugins add the following repository:
 
 ```kotlin
+// settings.gradle.kts
 pluginManagement {
     repositories {
         mavenCentral()
@@ -40,27 +40,60 @@ pluginManagement {
 }
 ```
 
+Then either apply the plugins directly to your own modules:
+
+```kotlin
+// In my-monorepo/app/build.gradle.kts
+plugins {
+    id("com.kroger.gradle.plugin.KotlinAndroidApplicationBannerConvention")
+}
+```
+
+Or apply these plugins from your own convention plugins. This approach allows you to layer your own configuration on top of what the plugins provide:
+
+```kotlin
+// Under my-monorepo/build-logic (or similar)
+class MyMonoRepoLibraryConventionPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        target.pluginManager.apply(AndroidLibraryConventionPlugin::class)
+        
+        // apply more plugins and do further configuration here as well
+    }
+}
+```
+
+> [!WARNING]
+> The plugins require Gradle 9.2.0+ and Android Gradle Plugin 9.0.1+ for Android projects.
+
 ## Version Catalog Requirements
-When using the convention plugins certain versions are expected to be in the version catalog of the project. The version catalog named `libs` is used by default but the catalog can be changed by setting the `kgp.versioncatalog.name` property in the `gradle.properties` file of the root project.
+
+When using the convention plugins, certain versions are expected to be in the version catalog of the project. The version catalog named `libs` is used by default but the catalog can be changed by setting the `kgp.versioncatalog.name` property in the root `gradle.properties`.
 
 The following versions are required in the version catalog:
-- **kgpJdk**: The JDK version to use when setting `jvmToolchain`.
-- **kgpJvmTarget**: Defaults to the kgpJdk version but can be overridden to set the JVM target version if different.
-- **kgpKotlinApiVersion**: The Kotlin API version to use. Defaults to the Kotlin Gradle Plugin version.
-- **kgpKotlinLanguageVersion**: The Kotlin language version to use. Defaults to the Kotlin Gradle Plugin version.
 
-The following versions are required in the version catalog when using Android convention plugins:
-- **kgpCompileSdk**: The SDK version the application compiles against.
-- **kgpMinSdk**: The minimum API level required to run the application.
-- **kgpTargetSdk**: The API level the application targets. For applications this sets `defaultConfig.targetSdk`. For libraries this sets `testOptions.targetSdk` and `lint.targetSdk`.
-- **kgpDokka**: The version used for the Android Documentation Plugin dependency.
+| Version Key                | Description                                                                                       |
+|----------------------------|---------------------------------------------------------------------------------------------------|
+| `kgpJdk`                   | The JDK version to use when setting `jvmToolchain`.                                               |
+| `kgpJvmTarget`             | Defaults to the kgpJdk version, but can be overridden to set the JVM target version if different. |
+| `kgpKotlinApiVersion`      | The Kotlin API version to use. Defaults to the Kotlin Gradle Plugin version.                      |
+| `kgpKotlinLanguageVersion` | The Kotlin language version to use. Defaults to the Kotlin Gradle Plugin version.                 |
+
+For Android projects, the following versions are required in the version catalog:
+
+| Version Key     | Description                                                                                                                                                        |
+|-----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `kgpCompileSdk` | The SDK version the application compiles against.                                                                                                                  |
+| `kgpMinSdk`     | The minimum API level required to run the application.                                                                                                             |
+| `kgpTargetSdk`  | The API level the application targets. For applications this sets `defaultConfig.targetSdk`. For libraries this sets `testOptions.targetSdk` and `lint.targetSdk`. |
+| `kgpDokka`      | The version used for the Android Documentation Plugin dependency.                                                                                                  |
 
 # Plugins
 
 ## Gradle Properties
+
 Some convention plugins auto-apply other plugins to better support common use cases. However, it is possible the plugins are not wanted on certain projects. When present in the `gradle.properties` file, the properties below can be used to prevent plugins from being auto-applied on supported projects:
 
-```
+```properties
 kgp.plugins.autoapply.abivalidation=false
 kgp.plugins.autoapply.dependencymanagement=false
 kgp.plugins.autoapply.dependencyguard=false
