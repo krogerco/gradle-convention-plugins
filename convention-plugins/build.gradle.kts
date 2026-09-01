@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -111,7 +111,8 @@ gradlePlugin {
 
 dependencies {
     compileOnly(libs.gradlePlugins.android)
-    compileOnly(libs.gradlePlugins.androidJunit5)
+    compileOnly(libs.gradlePlugins.androidBcvBridge)
+    compileOnly(libs.gradlePlugins.androidJunitFramework)
     compileOnly(libs.gradlePlugins.binaryCompatibilityValidator)
     compileOnly(libs.gradlePlugins.compose)
     compileOnly(libs.gradlePlugins.dependencyAnalysis)
@@ -134,6 +135,5 @@ dependencies {
     testImplementation(libs.jupiter.api)
     testImplementation(libs.koTest)
 
-    testRuntimeDependencies(libs.gradlePlugins.foojayResolver)
     testRuntimeDependencies(libs.gradlePlugins.kotlin.serialization)
 }

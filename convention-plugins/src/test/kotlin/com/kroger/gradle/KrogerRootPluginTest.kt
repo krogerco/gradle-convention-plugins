@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -182,7 +182,7 @@ class KrogerRootPluginTest {
     @Test
     fun `GIVEN root plugin WHEN gradle version out of date THEN error occurs`() {
         testProjectBuilder.build()
-        val gradleVersion = "8.11"
+        val gradleVersion = "9.1.0"
         val result = gradleRunner(testProjectDir, arguments = arrayOf("tasks"))
             .withGradleVersion(gradleVersion)
             .buildAndFail()

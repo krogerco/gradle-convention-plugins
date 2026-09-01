@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,21 +31,11 @@ import java.io.File
 
 /**
  * [CommandLineArgumentProvider] to configure location of generated schema files for room databases.
- * [isKsp] should be true for KSP support and false for KAPT support.
  */
 public class RoomSchemaArgProvider(
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
     public val schemaDir: File,
-    private val isKsp: Boolean = true,
 ) : CommandLineArgumentProvider {
-    override fun asArguments(): Iterable<String> {
-        val argPrefix = if (isKsp) {
-            ""
-        } else {
-            "-A"
-        }
-
-        return listOf("${argPrefix}room.schemaLocation=${schemaDir.path}")
-    }
+    override fun asArguments(): Iterable<String> = listOf("room.schemaLocation=${schemaDir.path}")
 }

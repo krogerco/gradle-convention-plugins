@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
  */
 package com.kroger.gradle.config
 
+import com.android.build.gradle.internal.utils.KSP_PLUGIN_ID
 import dagger.hilt.android.plugin.HiltGradlePlugin
 import kotlinx.kover.gradle.plugin.KoverGradlePlugin
 import org.gradle.api.Project
@@ -36,6 +37,8 @@ import org.jetbrains.dokka.gradle.DokkaPlugin
 import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationExtension
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
+import org.jetbrains.kotlin.gradle.plugin.KotlinBaseApiPlugin
 import org.jmailen.gradle.kotlinter.KotlinterPlugin
 
 // region plugin configuration
@@ -124,10 +127,10 @@ internal fun Project.configureDokka(isDokkaEnabled: Boolean, isAndroidProject: B
  */
 internal fun Project.configureHilt(isHiltEnabled: Boolean) {
     if (isHiltEnabled) {
-        pluginManager.apply("org.jetbrains.kotlin.kapt")
         pluginManager.apply(HiltGradlePlugin::class.java)
+        pluginManager.apply(KSP_PLUGIN_ID)
 
-        hilt()
+        hiltKsp(false)
     }
 }
 
@@ -149,6 +152,27 @@ internal fun Project.configureKover(isKoverEnabled: Boolean) {
     }
 }
 // endregion
+
+// region Built-in Kotlin detection
+
+/**
+ * Determines if AGP's built-in Kotlin is enabled. Built-in Kotlin applies `KotlinBaseApiPlugin` or a subclass and
+ * does not apply the Kotlin Android plugin.
+ */
+internal fun Project.isAgpBuiltInKotlinUsed(): Boolean =
+    plugins.withType(KotlinBaseApiPlugin::class.java).any() &&
+        !pluginManager.hasPlugin("org.jetbrains.kotlin.android")
+
+// endregion
+
+/**
+ * Conditionally applies the Kotlin Android plugin based on AGP's built-in Kotlin setting.
+ */
+internal fun Project.applyKotlinAndroidPluginIfNeeded() {
+    if (!isAgpBuiltInKotlinUsed()) {
+        pluginManager.apply(KotlinAndroidPluginWrapper::class.java)
+    }
+}
 
 /**
  * Returns the value of the BUILD_VERSION environment variable

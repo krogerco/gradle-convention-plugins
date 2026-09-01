@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,12 +29,10 @@ import com.android.build.api.dsl.CommonExtension
 import com.google.devtools.ksp.gradle.KspExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.DependencyHandler
-import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import java.io.File
 
 // TODO Ideally the extensions on Project would all be on DependencyHandler instead but I could
@@ -80,45 +78,6 @@ public fun Project.hiltKsp(androidxHiltCompiler: Boolean = false) {
 }
 
 /**
- * Adds hilt android and hilt android compiler KAPT dependencies.
- * This requires the Version Catalog to have a "kgpDagger" version.
- * A `kgpAndroidxHiltCompiler` version is required when [androidxHiltCompiler] is true
- * @param androidxHiltCompiler whether or not to also add the androidx hilt compiler
- */
-@Deprecated(
-    message = "Migrate to ksp by using hiltKsp()",
-    replaceWith = ReplaceWith(
-        expression = "hiltKsp()",
-    ),
-)
-public fun Project.hilt(
-    androidxHiltCompiler: Boolean = false,
-) {
-    val versions = KgpProperties(project).kgpVersions
-    val daggerVersion = versions.kgpDagger
-
-    extensions.configure<KaptExtension> {
-        correctErrorTypes = true
-    }
-
-    dependencies {
-        add(Configurations.IMPLEMENTATION, "javax.inject:javax.inject:1")
-        add(Configurations.IMPLEMENTATION, "com.google.dagger:hilt-android:$daggerVersion")
-        add(Configurations.KAPT, "com.google.dagger:hilt-android-compiler:$daggerVersion")
-
-        add(Configurations.TEST_IMPLEMENTATION, "com.google.dagger:hilt-android-testing:$daggerVersion")
-        add(Configurations.KAPT_TEST, "com.google.dagger:hilt-android-compiler:$daggerVersion")
-
-        add(Configurations.ANDROID_TEST_IMPLEMENTATION, "com.google.dagger:hilt-android-testing:$daggerVersion")
-        add(Configurations.KAPT_ANDROID_TEST, "com.google.dagger:hilt-android-compiler:$daggerVersion")
-        if (androidxHiltCompiler) {
-            val androidxHiltCompilerVersion = versions.kgpAndroidxHiltCompiler
-            add(Configurations.KAPT, "androidx.hilt:hilt-compiler:$androidxHiltCompilerVersion")
-        }
-    }
-}
-
-/**
  * Adds dagger KSP dependencies and optionally dagger-android and dagger-android-support.
  * This requires the Version Catalog to have a "kgpDagger" version.
  * @param daggerAndroid whether or not to also add the dagger-android dependencies
@@ -135,40 +94,6 @@ public fun Project.daggerKsp(daggerAndroid: Boolean = false, daggerAndroidSuppor
 
         if (daggerAndroid || daggerAndroidSupport) {
             add(Configurations.KSP, "com.google.dagger:dagger-android-processor:$daggerVersion")
-            add(Configurations.IMPLEMENTATION, "com.google.dagger:dagger-android:$daggerVersion")
-            if (daggerAndroidSupport) {
-                add(Configurations.IMPLEMENTATION, "com.google.dagger:dagger-android-support:$daggerVersion")
-            }
-        }
-    }
-}
-
-/**
- * Adds dagger KAPT dependencies and optionally dagger-android and dagger-android-support.
- * This requires the Version Catalog to have a "kgpDagger" version.
- * @param daggerAndroid whether or not to also add the dagger-android dependencies
- * @param daggerAndroidSupport whether or not to also add the dagger-android-support dependencies. When true
- * this also adds dagger-android dependencies
- */
-@Deprecated(
-    message = "Migrate to ksp by using daggerKsp()",
-    replaceWith = ReplaceWith(
-        expression = "daggerKsp()",
-    ),
-)
-public fun Project.dagger(daggerAndroid: Boolean = false, daggerAndroidSupport: Boolean = false) {
-    val daggerVersion = KgpProperties(project).kgpVersions.kgpDagger
-    extensions.configure<KaptExtension> {
-        correctErrorTypes = true
-    }
-
-    dependencies {
-        add(Configurations.IMPLEMENTATION, "com.google.dagger:dagger:$daggerVersion")
-        add(Configurations.IMPLEMENTATION, "javax.inject:javax.inject:1")
-        add(Configurations.KAPT, "com.google.dagger:dagger-compiler:$daggerVersion")
-
-        if (daggerAndroid || daggerAndroidSupport) {
-            add(Configurations.KAPT, "com.google.dagger:dagger-android-processor:$daggerVersion")
             add(Configurations.IMPLEMENTATION, "com.google.dagger:dagger-android:$daggerVersion")
             if (daggerAndroidSupport) {
                 add(Configurations.IMPLEMENTATION, "com.google.dagger:dagger-android-support:$daggerVersion")
@@ -238,45 +163,9 @@ public fun Project.moshi(
     }
 }
 
-/**
- * Adds Room dependencies and kapt processor.
- * This requires the Version Catalog to have a "kgpAndroidxRoom" version.
- * @param schemaDirectory where Room should generate schema json files for the database
- * @param commonExtension used to add [schemaDirectory] to androidTest source set if needed
- */
-@Deprecated(
-    message = "Migrate to ksp and use room()",
-    replaceWith = ReplaceWith(
-        expression = "room()",
-    ),
-)
-public fun Project.roomKapt(
-    schemaDirectory: Provider<Directory>,
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
-) {
-    val roomVersion = KgpProperties(project).kgpVersions.kgpAndroidxRoom
-    dependencies {
-        add(Configurations.IMPLEMENTATION, "androidx.room:room-runtime:$roomVersion")
-        add(Configurations.IMPLEMENTATION, "androidx.room:room-ktx:$roomVersion")
-        add(Configurations.KAPT, "androidx.room:room-compiler:$roomVersion")
-    }
-
-    schemaDirectory.orNull?.let { schemaDir ->
-        val schemaFile = schemaDir.asFile
-        commonRoomConfig(schemaFile, commonExtension, roomVersion)
-        commonExtension.defaultConfig {
-            javaCompileOptions {
-                annotationProcessorOptions {
-                    compilerArgumentProviders(RoomSchemaArgProvider(schemaFile, isKsp = false))
-                }
-            }
-        }
-    }
-}
-
 private fun Project.commonRoomConfig(
     schemaFile: File,
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
     roomVersion: String,
 ) {
     if (!schemaFile.exists()) {
@@ -285,10 +174,10 @@ private fun Project.commonRoomConfig(
 
     dependencies.add(Configurations.ANDROID_TEST_IMPLEMENTATION, "androidx.room:room-testing:$roomVersion")
 
-    commonExtension.sourceSets {
+    commonExtension.sourceSets.apply {
         // Adds exported schema location as test app assets.
         named("androidTest").configure {
-            assets.srcDir(schemaFile.path)
+            assets.directories.add(schemaFile.path)
         }
     }
 }
@@ -300,8 +189,8 @@ private fun Project.commonRoomConfig(
  * @param commonExtension used to add [schemaDirectoryPath] to androidTest source set if needed
  */
 public fun Project.room(
-    schemaDirectoryPath: Provider<String?> = provider { project.layout.projectDirectory.dir("schemas").asFile.absolutePath },
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    schemaDirectoryPath: Provider<String>? = provider { project.layout.projectDirectory.dir("schemas").asFile.absolutePath },
+    commonExtension: CommonExtension,
 ) {
     val roomVersion = KgpProperties(project).kgpVersions.kgpAndroidxRoom
     dependencies {
@@ -311,22 +200,23 @@ public fun Project.room(
         add(Configurations.ANDROID_TEST_IMPLEMENTATION, "androidx.room:room-testing:$roomVersion")
     }
 
-    schemaDirectoryPath.orNull?.let { schemaPath ->
+    schemaDirectoryPath?.get()?.let { schemaPath ->
         pluginManager.apply(RoomGradlePlugin::class.java)
         extensions.configure<RoomExtension> {
             schemaDirectory(schemaPath)
         }
 
-        commonExtension.sourceSets {
+        commonExtension.sourceSets.apply {
             // Adds exported schema location as test app assets.
             named("androidTest").configure {
-                assets.srcDir(schemaPath)
+                assets.directories.add(schemaPath)
             }
         }
     }
 }
 
 // region testing
+
 /**
  * Adds the required dependencies to use JUnit 5.
  * This requires the Version Catalog to have a `kgpJunitBom` version.
@@ -356,6 +246,7 @@ public fun Project.junitVintage() {
 // endregion
 
 // region compose
+
 /**
  * Imports the compose BOM. This requires the Version Catalog to have an `kgpAndroidxComposeBom` version.
  */

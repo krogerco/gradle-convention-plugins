@@ -1,23 +1,23 @@
 [versions]
-androidGradlePlugin = "8.10.0"
-binaryCompatibilityValidator = "0.18.1"
-androidJunit5Plugin = "1.12.0.0"
+androidGradlePlugin = "9.0.1"
+androidJunitFramework = "2.0.1"
+androidBcvBridge = "0.2.0"
+binaryCompatibilityValidator = "0.18.1" # This version is important to androidBcvBridge; change them together
 androidxLintGradle = "1.0.0-alpha03"
 androidxRoom = "2.7.0"
 catalogVersionsPlugin = "0.8.5"
 dependencyAnalysisPlugin = "2.13.3"
 dependencyGuard = "0.5.0"
-foojay = "0.9.0"
 dokka = "2.0.0"
 gradleMavenPublishPlugin = "0.35.0" # any further upgrade requires Gradle 9
 gradleVersionsPlugin = "0.52.0"
-hilt = "2.56.2"
+hilt = "2.59.2"
 junitBom = "5.12.0"
 kotlin = "2.2.21"
-kotlinter = "5.0.2"
+kotlinter = "5.4.2"
 koTest = "5.9.1"
-kover = "0.9.1"
-ksp = "2.2.21-2.0.5"
+kover = "0.9.9"
+ksp = "2.3.6"
 
 [libraries]
 androidx-lint-gradle = { module = "androidx.lint:lint-gradle", version.ref = "androidxLintGradle" }
@@ -28,8 +28,8 @@ jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
 
 koTest = { module = "io.kotest:kotest-assertions-core", version.ref = "koTest" }
 
-# plugins for classpath (usually not necessary but are for conventional precompiled gradle plugin usage)
-gradlePlugins-androidJunit5 = { module = "de.mannodermaus.gradle.plugins:android-junit5", version.ref = "androidJunit5Plugin" }
+gradlePlugins-androidBcvBridge = { module = "io.github.tjokinen.android-bcv-bridge:io.github.tjokinen.android-bcv-bridge.gradle.plugin", version.ref = "androidBcvBridge" }
+gradlePlugins-androidJunitFramework = { module = "de.mannodermaus.gradle.plugins:android-junit5", version.ref = "androidJunitFramework" }
 gradlePlugins-binaryCompatibilityValidator = { module = "org.jetbrains.kotlinx:binary-compatibility-validator", version.ref = "binaryCompatibilityValidator" }
 gradlePlugins-android = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
 gradlePlugins-catalogVersions = { module = "nl.littlerobots.version-catalog-update:nl.littlerobots.version-catalog-update.gradle.plugin", version.ref = "catalogVersionsPlugin" }
@@ -37,7 +37,6 @@ gradlePlugins-compose = { module = "org.jetbrains.kotlin.plugin.compose:org.jetb
 gradlePlugins-dependencyAnalysis = { module = "com.autonomousapps:dependency-analysis-gradle-plugin", version.ref = "dependencyAnalysisPlugin"}
 gradlePlugins-dependencyGuard = { module = "com.dropbox.dependency-guard:dependency-guard", version.ref = "dependencyGuard" }
 gradlePlugins-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
-gradlePlugins-foojayResolver = { module = "org.gradle.toolchains:foojay-resolver", version.ref = "foojay" }
 gradlePlugins-gradleVersions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "gradleVersionsPlugin" }
 gradlePlugins-gradleMavenPublishPlugin = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "gradleMavenPublishPlugin" }
 gradlePlugins-hilt = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt"}

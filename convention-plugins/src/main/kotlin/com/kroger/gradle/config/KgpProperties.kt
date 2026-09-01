@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -85,7 +85,7 @@ internal class KgpProperties private constructor(private val project: Project) {
             try {
                 ComposeDependencies.valueOf(propertyValue.uppercase())
             } catch (e: IllegalArgumentException) {
-                val composeDependencies = ComposeDependencies.values().joinToString { it.name.lowercase() }
+                val composeDependencies = ComposeDependencies.entries.joinToString { it.name.lowercase() }
                 throw IllegalArgumentException("Invalid compose dependencies value: $propertyValue. Valid values are: $composeDependencies", e)
             }
         } ?: ComposeDependencies.NONE

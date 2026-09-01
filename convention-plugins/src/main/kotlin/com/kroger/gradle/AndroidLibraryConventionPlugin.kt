@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ import com.android.build.api.dsl.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.kroger.gradle.config.KgpProperties
 import com.kroger.gradle.config.MIN_SUPPORTED_AGP_VERSION
+import com.kroger.gradle.config.applyKotlinAndroidPluginIfNeeded
 import com.kroger.gradle.config.configureAbiValidation
 import com.kroger.gradle.config.configureDependencyGuard
 import com.kroger.gradle.config.configureDokka
@@ -35,12 +36,13 @@ import com.kroger.gradle.config.configureHilt
 import com.kroger.gradle.config.configureKotlinAndroid
 import com.kroger.gradle.config.configureKotlinter
 import com.kroger.gradle.config.configureKover
+import com.kroger.gradle.config.isAgpBuiltInKotlinUsed
 import de.mannodermaus.gradle.plugins.junit5.AndroidJUnitPlatformPlugin
+import io.github.tjokinen.androidbcvbridge.AndroidBcvBridgePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
-import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
 
 /**
  * Apply conventions common to Android libraries.
@@ -56,8 +58,8 @@ public class AndroidLibraryConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply(LibraryPlugin::class.java)
+                applyKotlinAndroidPluginIfNeeded()
                 apply(AndroidJUnitPlatformPlugin::class.java)
-                apply(KotlinAndroidPluginWrapper::class.java)
                 configureDependencyGuard(kgpProperties.autoApplyDependencyGuard, isAndroidProject = true)
                 configureDokka(kgpProperties.autoApplyDokka, true)
                 configureHilt(kgpProperties.autoConfigureHiltLibrary)
@@ -72,7 +74,13 @@ public class AndroidLibraryConventionPlugin : Plugin<Project> {
                     lint.targetSdk = kgpVersions.kgpTargetSdk
                 }
             }
-            configureAbiValidation(kgpProperties.autoApplyAbiValidation, kgpProperties.autoApplyExperimentalAbiValidation)
+
+            if (isAgpBuiltInKotlinUsed()) {
+                /* This bridge applies and configures ABI validation in a way that works for built in kotlin, note that the tasks will be named releaseApiCheck and releaseApiDump */
+                pluginManager.apply(AndroidBcvBridgePlugin::class.java)
+            } else {
+                configureAbiValidation(kgpProperties.autoApplyAbiValidation, kgpProperties.autoApplyExperimentalAbiValidation)
+            }
         }
     }
 }
