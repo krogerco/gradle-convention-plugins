@@ -1,4 +1,4 @@
-/**
+/*
  * MIT License
  *
  * Copyright (c) 2024 The Kroger Co. All rights reserved.
@@ -29,8 +29,8 @@ import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.AppPlugin
 import com.kroger.gradle.config.KgpProperties
 import com.kroger.gradle.config.MIN_SUPPORTED_AGP_VERSION
-import com.kroger.gradle.config.configureHilt
 import com.kroger.gradle.config.applyKotlinAndroidPluginIfNeeded
+import com.kroger.gradle.config.configureHilt
 import com.kroger.gradle.config.configureKotlinAndroid
 import com.kroger.gradle.config.configureKotlinter
 import com.kroger.gradle.config.configureKover

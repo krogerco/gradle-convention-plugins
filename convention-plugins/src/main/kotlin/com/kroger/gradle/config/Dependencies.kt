@@ -1,4 +1,4 @@
-/**
+/*
  * MIT License
  *
  * Copyright (c) 2024 The Kroger Co. All rights reserved.
@@ -216,6 +216,7 @@ public fun Project.room(
 }
 
 // region testing
+
 /**
  * Adds the required dependencies to use JUnit 5.
  * This requires the Version Catalog to have a `kgpJunitBom` version.
@@ -245,6 +246,7 @@ public fun Project.junitVintage() {
 // endregion
 
 // region compose
+
 /**
  * Imports the compose BOM. This requires the Version Catalog to have an `kgpAndroidxComposeBom` version.
  */

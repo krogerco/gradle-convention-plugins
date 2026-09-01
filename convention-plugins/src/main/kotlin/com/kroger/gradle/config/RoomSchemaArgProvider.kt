@@ -1,4 +1,4 @@
-/**
+/*
  * MIT License
  *
  * Copyright (c) 2024 The Kroger Co. All rights reserved.
@@ -37,7 +37,5 @@ public class RoomSchemaArgProvider(
     @get:PathSensitive(PathSensitivity.RELATIVE)
     public val schemaDir: File,
 ) : CommandLineArgumentProvider {
-    override fun asArguments(): Iterable<String> {
-        return listOf("room.schemaLocation=${schemaDir.path}")
-    }
+    override fun asArguments(): Iterable<String> = listOf("room.schemaLocation=${schemaDir.path}")
 }

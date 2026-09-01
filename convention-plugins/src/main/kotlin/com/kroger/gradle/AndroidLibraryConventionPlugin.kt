@@ -1,4 +1,4 @@
-/**
+/*
  * MIT License
  *
  * Copyright (c) 2024 The Kroger Co. All rights reserved.
@@ -75,7 +75,8 @@ public class AndroidLibraryConventionPlugin : Plugin<Project> {
                 }
             }
 
-            if (isAgpBuiltInKotlinUsed()) {/* This bridge applies and configures ABI validation in a way that works for built in kotlin, note that the tasks will be named releaseApiCheck and releaseApiDump */
+            if (isAgpBuiltInKotlinUsed()) {
+                /* This bridge applies and configures ABI validation in a way that works for built in kotlin, note that the tasks will be named releaseApiCheck and releaseApiDump */
                 pluginManager.apply(AndroidBcvBridgePlugin::class.java)
             } else {
                 configureAbiValidation(kgpProperties.autoApplyAbiValidation, kgpProperties.autoApplyExperimentalAbiValidation)

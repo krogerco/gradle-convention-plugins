@@ -1,4 +1,4 @@
-/**
+/*
  * MIT License
  *
  * Copyright (c) 2024 The Kroger Co. All rights reserved.
@@ -25,4 +25,4 @@ package com.kroger.gradle.config
 
 import com.android.build.api.AndroidPluginVersion
 
-internal val MIN_SUPPORTED_AGP_VERSION by lazy { AndroidPluginVersion(9,0,1) }
+internal val MIN_SUPPORTED_AGP_VERSION by lazy { AndroidPluginVersion(9, 0, 1) }

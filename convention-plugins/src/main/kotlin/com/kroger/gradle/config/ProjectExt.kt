@@ -1,4 +1,4 @@
-/**
+/*
  * MIT License
  *
  * Copyright (c) 2024 The Kroger Co. All rights reserved.
@@ -160,8 +160,8 @@ internal fun Project.configureKover(isKoverEnabled: Boolean) {
  * does not apply the Kotlin Android plugin.
  */
 internal fun Project.isAgpBuiltInKotlinUsed(): Boolean =
-    plugins.withType(KotlinBaseApiPlugin::class.java).any()
-            && !pluginManager.hasPlugin("org.jetbrains.kotlin.android")
+    plugins.withType(KotlinBaseApiPlugin::class.java).any() &&
+        !pluginManager.hasPlugin("org.jetbrains.kotlin.android")
 
 // endregion
 
