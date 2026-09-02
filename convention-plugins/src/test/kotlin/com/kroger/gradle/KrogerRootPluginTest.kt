@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@ import com.kroger.gradle.util.rootProject
 import com.kroger.gradle.util.shouldContainAll
 import com.kroger.gradle.util.shouldNotContainAny
 import io.kotest.matchers.string.shouldContain
-import io.kotest.matchers.string.shouldNotContain
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -66,13 +65,10 @@ class KrogerRootPluginTest {
             "formatKotlinFiles - ",
             // tasks from Dependency Management
             "buildHealth - ",
-            // tasks from dokka
-            "dokkaHtml",
-        )
-
-        // single module project should not contain dokka multi module task
-        output.shouldNotContain(
-            "dokkaHtmlMultiModule",
+            // tasks from dokka v2
+            "dokkaGenerate - ",
+            "dokkaGenerateModuleHtml - ",
+            "dokkaGeneratePublicationHtml - ",
         )
     }
 
@@ -98,12 +94,12 @@ class KrogerRootPluginTest {
             // Dependency Management tasks do not exist
             "buildHealth - ",
             // dokka tasks do not exist
-            "dokkaHtml",
+            "dokkaGenerate - ",
         )
     }
 
     @Test
-    fun `GIVEN root plugin WHEN multi module build THEN dokka has multi module report task`() {
+    fun `GIVEN root plugin WHEN multi module build THEN dokka has aggregation task`() {
         testProjectBuilder.versionCatalogSpec.versions["kgpJdk"] = "\"11\""
         testProjectBuilder.addSubproject("kotlin-module") {
             addPlugin("com.kroger.gradle.published-kotlin-library-conventions")
@@ -114,9 +110,55 @@ class KrogerRootPluginTest {
             .build()
             .output
 
+        // In v2, aggregation uses dokkaGeneratePublicationHtml (same task but with aggregated content)
         output.shouldContain(
-            "dokkaHtmlMultiModule",
+            "dokkaGeneratePublicationHtml - ",
         )
+
+        // Verify that the subproject was detected for aggregation
+        output.shouldContain("Dokka: Aggregating documentation from 1 subproject(s)")
+        output.shouldContain(":kotlin-module")
+    }
+
+    @Test
+    fun `GIVEN root plugin WHEN multiple subprojects with dokka THEN aggregates all modules`() {
+        testProjectBuilder.versionCatalogSpec.versions["kgpJdk"] = "\"11\""
+        testProjectBuilder.addSubproject("kotlin-module-1") {
+            addPlugin("com.kroger.gradle.published-kotlin-library-conventions")
+        }
+        testProjectBuilder.addSubproject("kotlin-module-2") {
+            addPlugin("com.kroger.gradle.published-kotlin-library-conventions")
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, arguments = arrayOf("tasks"))
+            .build()
+            .output
+
+        // Verify both subprojects are detected for aggregation
+        output.shouldContain("Dokka: Aggregating documentation from 2 subproject(s)")
+        output.shouldContain(":kotlin-module-1")
+        output.shouldContain(":kotlin-module-2")
+    }
+
+    @Test
+    fun `GIVEN root plugin WHEN multi module build without dokka in subprojects THEN warning shown`() {
+        testProjectBuilder.versionCatalogSpec.versions["kgpJdk"] = "\"11\""
+        testProjectBuilder.addSubproject("kotlin-module") {
+            addPlugin("com.kroger.gradle.published-kotlin-library-conventions")
+            withProperties {
+                put("kgp.plugins.autoapply.dokka", "false")
+            }
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, arguments = arrayOf("tasks"))
+            .build()
+            .output
+
+        // Verify warning when no subprojects have Dokka
+        output.shouldContain("Dokka: No subprojects with Dokka plugin found")
+        output.shouldContain("Ensure subprojects use convention plugins that apply Dokka")
     }
 
     @Test
@@ -140,7 +182,7 @@ class KrogerRootPluginTest {
     @Test
     fun `GIVEN root plugin WHEN gradle version out of date THEN error occurs`() {
         testProjectBuilder.build()
-        val gradleVersion = "8.3"
+        val gradleVersion = "9.1.0"
         val result = gradleRunner(testProjectDir, arguments = arrayOf("tasks"))
             .withGradleVersion(gradleVersion)
             .buildAndFail()

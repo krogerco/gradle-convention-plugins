@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ package com.kroger.gradle
 import com.kroger.gradle.util.JDK_VERSION
 import com.kroger.gradle.util.KOTLIN_VERSION
 import com.kroger.gradle.util.RootTestProjectBuilder
+import com.kroger.gradle.util.TestProjectBuilder
 import com.kroger.gradle.util.gradleRunner
 import com.kroger.gradle.util.rootProject
 import com.kroger.gradle.util.shouldContainAll
@@ -46,13 +47,13 @@ class PublishedAndroidLibraryConventionPluginTest {
         testProjectBuilder = rootProject(projectDir = testProjectDir) {
             versionCatalogSpec.versions.apply {
                 put("kgpAndroidDesugarJdkLibs", "\"1.0.0\"")
-                put("kgpAndroidxComposeCompiler", "\"1.3.2\"")
                 put("kgpAndroidxComposeBom", "\"2022-12-00\"")
                 put("kgpCompileSdk", "\"32\"")
                 put("kgpDokka", "\"1.8.20\"")
                 put("kgpKotlin", "\"$KOTLIN_VERSION\"")
                 put("kgpJdk", "\"$JDK_VERSION\"")
                 put("kgpMinSdk", "\"26\"")
+                put("kgpTargetSdk", "\"32\"")
             }
             addPlugin("com.kroger.gradle.root")
             addPlugin("com.kroger.gradle.published-android-library-conventions", apply = false)
@@ -63,12 +64,12 @@ class PublishedAndroidLibraryConventionPluginTest {
                     android {
                         namespace = "com.kroger.kgp.testmodule"
                     }
-     
+
                     afterEvaluate {
                         val hasHiltPlugin = pluginManager.hasPlugin("com.google.dagger.hilt.android")
-                        val hasKaptPlugin = pluginManager.hasPlugin("org.jetbrains.kotlin.kapt")
+                        val hasKspPlugin = pluginManager.hasPlugin("com.google.devtools.ksp")
                         println("hasHiltPlugin: ${"$"}hasHiltPlugin")
-                        println("hasKaptPlugin: ${"$"}hasKaptPlugin")
+                        println("hasKspPlugin: ${"$"}hasKspPlugin")
                     }
                     """.trimIndent(),
                 )
@@ -86,20 +87,26 @@ class PublishedAndroidLibraryConventionPluginTest {
         testProjectBuilder.build()
 
         val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .withEnvironment(
+                mapOf(
+                    "ARTIFACTORY_USERNAME" to "fakeusername",
+                    "ARTIFACTORY_PASSWORD" to "fakepassword",
+                ),
+            )
             .build()
             .output
 
         output.shouldContainAll(
             // default tasks
             "assemble - ",
-            "dokkaHtml - ",
+            "dokkaGenerate - ",
             "installDebugAndroidTest - ",
             "koverHtmlReportDebug",
             "lintKotlin - ",
             "publishMavenPublicationToArtifactoryRepository - ",
             // hilt configuration
             "hasHiltPlugin: false",
-            "hasKaptPlugin: false",
+            "hasKspPlugin: false",
         )
     }
 
@@ -121,7 +128,7 @@ class PublishedAndroidLibraryConventionPluginTest {
         output.shouldContainAll(
             // hilt configuration
             "hasHiltPlugin: true",
-            "hasKaptPlugin: true",
+            "hasKspPlugin: true",
         )
     }
 
@@ -150,7 +157,9 @@ class PublishedAndroidLibraryConventionPluginTest {
             .build()
             .output
 
-        output.shouldNotContain("dokka")
+        output
+            .substringAfter("Task :android-library-module:tasks") // in the current version of dokka there are warnings printed
+            .shouldNotContain("dokka")
     }
 
     @Test
@@ -163,6 +172,80 @@ class PublishedAndroidLibraryConventionPluginTest {
             .buildAndFail()
             .output
 
-        output.shouldContain("Missing version catalog with name: libs")
+        output
+            .shouldContain("Missing version catalog with name: libs")
+    }
+
+    @Test
+    fun `WHEN published android library plugin applied with no java or kotlin overrides set THEN expected defaults used`() {
+        testProjectBuilder.configureSubproject("android-library-module") {
+            printJavaAndKotlinVersions()
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "Kotlin API Version: null",
+            "Kotlin Language Version: null",
+            "Java Source Compatibility: $JDK_VERSION",
+            "Java Target Compatibility: $JDK_VERSION",
+        )
+    }
+
+    @Test
+    fun `WHEN published android library plugin applied with java and kotlin overrides set THEN override values are used`() {
+        val jvmTarget = "11"
+        val kotlinVersion = "1.9"
+        testProjectBuilder.versionCatalogSpec.versions.apply {
+            put("kgpJvmTarget", "\"$jvmTarget\"")
+            put("kgpKotlinApiVersion", "\"$kotlinVersion\"")
+            put("kgpKotlinLanguageVersion", "\"$kotlinVersion\"")
+        }
+        testProjectBuilder.configureSubproject("android-library-module") {
+            printJavaAndKotlinVersions()
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "Kotlin API Version: $kotlinVersion",
+            "Kotlin Language Version: $kotlinVersion",
+            "Java Source Compatibility: $jvmTarget",
+            "Java Target Compatibility: $jvmTarget",
+        )
+
+        output.shouldContain("Dependency Guard tasks")
+
+        output.shouldContainAll(
+            "dependencyGuard",
+            "dependencyGuardBaseline",
+        )
+    }
+
+    private fun TestProjectBuilder.printJavaAndKotlinVersions() {
+        appendBuildFile(
+            """
+                afterEvaluate {
+                    kotlin {
+                        compilerOptions {
+                            println("Kotlin API Version: ${"$"}{apiVersion.orNull?.version}")
+                            println("Kotlin Language Version: ${"$"}{languageVersion.orNull?.version}")
+                        }
+                    }
+                    android {
+                        compileOptions {
+                            println("Java Source Compatibility: ${"$"}{sourceCompatibility}")
+                            println("Java Target Compatibility: ${"$"}{targetCompatibility}")
+                        }
+                    }
+                }
+            """.trimIndent(),
+        )
     }
 }

@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,6 @@
  */
 package com.kroger.gradle.config
 
-import com.android.build.api.AndroidPluginVersion
 import org.gradle.util.GradleVersion
 
 public object Configurations {
@@ -32,11 +31,9 @@ public object Configurations {
     public const val API: String = "api"
     public const val CORE_LIBRARY_DESUGARING: String = "coreLibraryDesugaring"
     public const val DEBUG_IMPLEMENTATION: String = "debugImplementation"
+    public const val DOKKA: String = "dokka"
     public const val DOKKA_PLUGIN: String = "dokkaPlugin"
     public const val IMPLEMENTATION: String = "implementation"
-    public const val KAPT: String = "kapt"
-    public const val KAPT_ANDROID_TEST: String = "kaptAndroidTest"
-    public const val KAPT_TEST: String = "kaptTest"
     public const val KSP: String = "ksp"
     public const val KSP_ANDROID_TEST: String = "kspAndroidTest"
     public const val KSP_TEST: String = "kspTest"
@@ -50,8 +47,4 @@ internal object ExtraKeys {
     internal const val KGP_PROPERTIES: String = "kgp.properties"
 }
 
-internal val MIN_SUPPORTED_AGP_VERSION by lazy { AndroidPluginVersion(8, 3, 0) }
-internal val MIN_SUPPORTED_GRADLE_VERSION = GradleVersion.version("8.4")
-
-internal val AndroidPluginVersion.version: String
-    get() = "$major.$minor.$micro"
+internal val MIN_SUPPORTED_GRADLE_VERSION = GradleVersion.version("9.2.0")

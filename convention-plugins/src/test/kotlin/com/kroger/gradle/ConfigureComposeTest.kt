@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@ import com.kroger.gradle.util.gradleRunner
 import com.kroger.gradle.util.rootProject
 import com.kroger.gradle.util.shouldContainAll
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -46,7 +47,6 @@ class ConfigureComposeTest {
             versionCatalogSpec.apply {
                 versions.apply {
                     put("kgpAndroidxComposeBom", "\"2022.12.00\"")
-                    put("kgpAndroidxComposeCompiler", "\"1.4.7\"")
                     put("kgpCompileSdk", "\"32\"")
                     put("kgpDokka", "\"1.8.20\"")
                     put("kgpKotlin", "\"$KOTLIN_VERSION\"")
@@ -83,15 +83,15 @@ class ConfigureComposeTest {
 
     @Test
     fun `GIVEN compose autoconfigure disabled WHEN gradle configuration runs THEN compose related versions are not needed`() {
-        testProjectBuilder.versionCatalogSpec.versions.apply {
-            remove("kgpAndroidxComposeCompiler")
-        }
         testProjectBuilder.withProperties {
             put("kgp.android.autoconfigure.compose", "false")
         }
         testProjectBuilder.build()
-        gradleRunner(testProjectDir, ":android-library-module:tasks")
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
             .build()
+            .output
+
+        output.shouldNotContain("implementation(androidx.compose:compose-bom:2022.12.00)")
     }
 
     @Test
@@ -112,17 +112,6 @@ class ConfigureComposeTest {
             .output
 
         output.shouldContain("implementation(androidx.compose:compose-bom:2022.12.00)")
-    }
-
-    @Test
-    fun `GIVEN compose autoconfigure enabled WHEN compose compiler version missing THEN exception thrown`() {
-        testProjectBuilder.versionCatalogSpec.versions.remove("kgpAndroidxComposeCompiler")
-        testProjectBuilder.build()
-        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
-            .buildAndFail()
-            .output
-
-        output.shouldContain("No version found in version catalog with alias: kgpAndroidxComposeCompiler")
     }
 
     @Test

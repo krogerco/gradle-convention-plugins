@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,10 @@ plugins {
 }
 
 version = System.getenv("BUILD_VERSION")
+
+lint {
+    baseline = file("lint-baseline.xml")
+}
 
 kotlin {
     explicitApi()
@@ -107,8 +111,12 @@ gradlePlugin {
 
 dependencies {
     compileOnly(libs.gradlePlugins.android)
-    compileOnly(libs.gradlePlugins.androidJunit5)
+    compileOnly(libs.gradlePlugins.androidBcvBridge)
+    compileOnly(libs.gradlePlugins.androidJunitFramework)
+    compileOnly(libs.gradlePlugins.binaryCompatibilityValidator)
+    compileOnly(libs.gradlePlugins.compose)
     compileOnly(libs.gradlePlugins.dependencyAnalysis)
+    compileOnly(libs.gradlePlugins.dependencyGuard)
     compileOnly(libs.gradlePlugins.dokka)
     compileOnly(libs.gradlePlugins.gradleMavenPublishPlugin)
     compileOnly(libs.gradlePlugins.gradleVersions)
@@ -121,10 +129,11 @@ dependencies {
 
     lintChecks(libs.androidx.lint.gradle)
 
+    testImplementation(platform(libs.junit.bom))
     testRuntimeOnly(libs.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.jupiter.api)
     testImplementation(libs.koTest)
 
-    testRuntimeDependencies(libs.gradlePlugins.foojayResolver)
     testRuntimeDependencies(libs.gradlePlugins.kotlin.serialization)
 }

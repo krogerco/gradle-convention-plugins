@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,29 +23,95 @@
  */
 package com.kroger.gradle.config
 
+import com.android.build.gradle.internal.utils.KSP_PLUGIN_ID
 import dagger.hilt.android.plugin.HiltGradlePlugin
 import kotlinx.kover.gradle.plugin.KoverGradlePlugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.provider.Provider
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.withType
+import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.dokka.gradle.DokkaPlugin
-import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.dsl.abi.AbiValidationExtension
+import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
+import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
+import org.jetbrains.kotlin.gradle.plugin.KotlinBaseApiPlugin
 import org.jmailen.gradle.kotlinter.KotlinterPlugin
 
 // region plugin configuration
 /**
+ * Configures ABI validation for the project.
+ *
+ * When [isBcvEnabled] is true, applies the Binary Compatibility Validator plugin for stable ABI checking.
+ * When [isExperimentalEnabled] is true, also enables the built-in Kotlin ABI validation (Kotlin 2.2+).
+ */
+@OptIn(ExperimentalAbiValidation::class)
+internal fun Project.configureAbiValidation(isBcvEnabled: Boolean, isExperimentalEnabled: Boolean) {
+    if (isBcvEnabled && !pluginManager.hasPlugin("org.jetbrains.kotlinx.binary-compatibility-validator")) {
+        try {
+            pluginManager.apply("org.jetbrains.kotlinx.binary-compatibility-validator")
+        } catch (_: org.gradle.api.plugins.UnknownPluginException) {
+            logger.warn("Binary Compatibility Validator plugin not found on classpath. Add 'org.jetbrains.kotlinx:binary-compatibility-validator' to enable ABI validation.")
+        }
+    }
+    if (isExperimentalEnabled) {
+        kotlinExtension.configure<AbiValidationExtension> {
+            enabled.set(true)
+        }
+    }
+}
+
+/**
+ * When [isDependencyGuardEnabled] is true, adds the DependencyGuard plugin.
+ */
+internal fun Project.configureDependencyGuard(isDependencyGuardEnabled: Boolean, isAndroidProject: Boolean = false) {
+    if (isDependencyGuardEnabled) {
+        val runtimeClassPath = if (isAndroidProject) {
+            "releaseRuntimeClasspath"
+        } else {
+            "runtimeClasspath"
+        }
+        val compileClasspath = if (isAndroidProject) {
+            "releaseCompileClasspath"
+        } else {
+            "compileClasspath"
+        }
+        pluginManager.apply("com.dropbox.dependency-guard")
+        pluginManager.withPlugin("com.dropbox.dependency-guard") {
+            extensions.configure<com.dropbox.gradle.plugins.dependencyguard.DependencyGuardPluginExtension>("dependencyGuard") {
+                configuration(runtimeClassPath) {
+                    allowedFilter = {
+                        !it.contains("junit")
+                    }
+                }
+                configuration(compileClasspath)
+            }
+        }
+    }
+}
+
+/**
  * When [isDokkaEnabled] is true, adds the Dokka plugin.
+ *
+ * Note: The KrogerRootPlugin automatically enables Dokka v2 mode (V2Enabled).
+ * Consumers can override this in gradle.properties if needed (e.g., V2EnabledWithHelpers for migration).
+ *
  * @param isAndroidProject when true adds the android documentation plugin dependency
  */
 internal fun Project.configureDokka(isDokkaEnabled: Boolean, isAndroidProject: Boolean = false) {
     if (isDokkaEnabled) {
         pluginManager.apply(DokkaPlugin::class.java)
-        tasks.withType<DokkaTask>().configureEach {
-            dokkaSourceSets.configureEach {
-                offlineMode.set(true)
+
+        // Configure Dokka v2 extension after plugin is applied
+        pluginManager.withPlugin("org.jetbrains.dokka") {
+            extensions.configure<DokkaExtension> {
+                // Configure all publications to use offline mode
+                dokkaPublications.configureEach {
+                    offlineMode.set(true)
+                }
             }
         }
 
@@ -61,10 +127,10 @@ internal fun Project.configureDokka(isDokkaEnabled: Boolean, isAndroidProject: B
  */
 internal fun Project.configureHilt(isHiltEnabled: Boolean) {
     if (isHiltEnabled) {
-        pluginManager.apply("org.jetbrains.kotlin.kapt")
         pluginManager.apply(HiltGradlePlugin::class.java)
+        pluginManager.apply(KSP_PLUGIN_ID)
 
-        hilt()
+        hiltKsp(false)
     }
 }
 
@@ -86,6 +152,27 @@ internal fun Project.configureKover(isKoverEnabled: Boolean) {
     }
 }
 // endregion
+
+// region Built-in Kotlin detection
+
+/**
+ * Determines if AGP's built-in Kotlin is enabled. Built-in Kotlin applies `KotlinBaseApiPlugin` or a subclass and
+ * does not apply the Kotlin Android plugin.
+ */
+internal fun Project.isAgpBuiltInKotlinUsed(): Boolean =
+    plugins.withType(KotlinBaseApiPlugin::class.java).any() &&
+        !pluginManager.hasPlugin("org.jetbrains.kotlin.android")
+
+// endregion
+
+/**
+ * Conditionally applies the Kotlin Android plugin based on AGP's built-in Kotlin setting.
+ */
+internal fun Project.applyKotlinAndroidPluginIfNeeded() {
+    if (!isAgpBuiltInKotlinUsed()) {
+        pluginManager.apply(KotlinAndroidPluginWrapper::class.java)
+    }
+}
 
 /**
  * Returns the value of the BUILD_VERSION environment variable

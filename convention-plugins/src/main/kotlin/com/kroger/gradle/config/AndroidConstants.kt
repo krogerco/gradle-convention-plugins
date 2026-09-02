@@ -21,29 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-rootProject.name = "gradle-convention-plugins"
-include("convention-plugins")
+package com.kroger.gradle.config
 
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        google()
-    }
-}
+import com.android.build.api.AndroidPluginVersion
 
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        mavenCentral()
-        google()
-        gradlePluginPortal {
-            content {
-                includeModule("com.github.ben-manes", "gradle-versions-plugin")
-                includeModule("io.github.tjokinen.android-bcv-bridge", "io.github.tjokinen.android-bcv-bridge.gradle.plugin")
-                includeModule("io.github.tjokinen", "android-bcv-bridge")
-                includeModule("org.gradle.toolchains", "foojay-resolver")
-                includeModule("org.jmailen.gradle", "kotlinter-gradle")
-            }
-        }
-    }
-}
+internal val MIN_SUPPORTED_AGP_VERSION by lazy { AndroidPluginVersion(9, 0, 1) }

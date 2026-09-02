@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
  */
 package com.kroger.gradle
 
+import com.kroger.gradle.config.Configurations
 import com.kroger.gradle.config.KgpProperties
 import com.kroger.gradle.config.MIN_SUPPORTED_GRADLE_VERSION
 import com.kroger.gradle.config.applyAndConfigureKotlinter
@@ -30,8 +31,7 @@ import com.kroger.gradle.config.buildVersion
 import com.kroger.gradle.config.configureDokka
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.Delete
-import org.gradle.kotlin.dsl.register
+import org.gradle.api.plugins.BasePlugin
 import org.gradle.util.GradleVersion
 
 /**
@@ -48,6 +48,14 @@ public class KrogerRootPlugin : Plugin<Project> {
         }
 
         with(target) {
+            // Auto-enable Dokka v2 if not explicitly set
+            val dokkaPluginModeProperty = "org.jetbrains.dokka.experimental.gradle.pluginMode"
+            if (!hasProperty(dokkaPluginModeProperty)) {
+                extensions.extraProperties.set(dokkaPluginModeProperty, "V2Enabled")
+            }
+
+            pluginManager.apply(BasePlugin::class.java)
+
             val kgpProperties = KgpProperties(this)
             if (kgpProperties.autoApplyDependencyManagement) {
                 pluginManager.apply(DependencyConventionPlugin::class.java)
@@ -65,9 +73,29 @@ public class KrogerRootPlugin : Plugin<Project> {
                 }
             }
 
-            tasks.register<Delete>("clean") {
-                group = "build"
-                delete(rootProject.layout.buildDirectory)
+            // Setup Dokka v2 aggregation
+            if (kgpProperties.autoApplyDokka) {
+                // Use gradle.projectsEvaluated to ensure all subprojects are configured
+                gradle.projectsEvaluated {
+                    val subprojectsWithDokka = subprojects.filter { subproject ->
+                        subproject.pluginManager.hasPlugin("org.jetbrains.dokka")
+                    }
+
+                    if (subprojectsWithDokka.isNotEmpty()) {
+                        logger.lifecycle("Dokka: Aggregating documentation from ${subprojectsWithDokka.size} subproject(s): ${subprojectsWithDokka.map { it.path }}")
+                        subprojectsWithDokka.forEach { subproject ->
+                            dependencies.add(Configurations.DOKKA, subproject)
+                        }
+                    } else {
+                        if (subprojects.isNotEmpty()) {
+                            logger.warn(
+                                "Dokka: No subprojects with Dokka plugin found. Aggregation will not include subproject documentation. " +
+                                    "Ensure subprojects use convention plugins that apply Dokka (e.g., published-android-library-conventions, " +
+                                    "published-kotlin-library-conventions) and that kgp.plugins.autoapply.dokka is not set to false.",
+                            )
+                        }
+                    }
+                }
             }
         }
     }

@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ public class ReleaseConventionPlugin : Plugin<Project> {
             afterEvaluate {
                 extensions.configure<PublishingExtension> {
                     val kgpProperties = KgpProperties(project)
-                    val repositoryName = kgpProperties.repositoryName ?: "Artifactory"
+                    val repositoryName = kgpProperties.repositoryName
                     val repositoryUrl = kgpProperties.repositoryUrl
                     if (repositories.isEmpty() && !repositoryUrl.isNullOrBlank()) {
                         logger.info("No repository configuration found so using kgp.repository.url setting: $repositoryUrl")
@@ -51,8 +51,8 @@ public class ReleaseConventionPlugin : Plugin<Project> {
                                 name = repositoryName
                                 url = project.uri(repositoryUrl)
                                 credentials {
-                                    username = System.getenv("ARTIFACTORY_USERNAME")
-                                    password = System.getenv("ARTIFACTORY_PASSWORD")
+                                    username = providers.environmentVariable(kgpProperties.repositoryUsernameEnvironmentVariable).get()
+                                    password = providers.environmentVariable(kgpProperties.repositoryPasswordEnvironmentVariable).get()
                                 }
                             }
                         }

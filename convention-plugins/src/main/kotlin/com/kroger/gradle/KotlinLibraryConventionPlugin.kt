@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,17 @@
 package com.kroger.gradle
 
 import com.kroger.gradle.config.KgpProperties
+import com.kroger.gradle.config.configureAbiValidation
+import com.kroger.gradle.config.configureDependencyGuard
 import com.kroger.gradle.config.configureDokka
 import com.kroger.gradle.config.configureKotlin
 import com.kroger.gradle.config.configureKover
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaLibraryPlugin
+import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.kotlin.dsl.assign
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.plugin.KotlinPluginWrapper
 import org.jmailen.gradle.kotlinter.KotlinterPlugin
@@ -45,6 +50,7 @@ public class KotlinLibraryConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply(JavaLibraryPlugin::class.java)
                 apply(KotlinPluginWrapper::class.java)
+                configureDependencyGuard(kgpProperties.autoApplyDependencyGuard)
                 configureDokka(kgpProperties.autoApplyDokka)
                 configureKover(kgpProperties.autoApplyKover)
                 if (kgpProperties.autoApplyKotlinter) {
@@ -53,6 +59,10 @@ public class KotlinLibraryConventionPlugin : Plugin<Project> {
             }
 
             configureKotlin(kgpVersions, ExplicitApiMode.Strict)
+            tasks.withType<JavaCompile>().configureEach {
+                options.release = kgpVersions.kgpJvmTarget
+            }
+            configureAbiValidation(kgpProperties.autoApplyAbiValidation, kgpProperties.autoApplyExperimentalAbiValidation)
         }
     }
 }

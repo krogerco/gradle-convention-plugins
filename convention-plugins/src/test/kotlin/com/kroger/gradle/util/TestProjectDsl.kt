@@ -1,7 +1,7 @@
-/**
+/*
  * MIT License
  *
- * Copyright (c) 2024 The Kroger Co. All rights reserved.
+ * Copyright (c) 2026 The Kroger Co. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -204,7 +204,7 @@ class RootTestProjectBuilder(private val name: String, projectPath: File) : Test
                     """
                     plugins {
                         // required to download toolchain
-                        id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+                        id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
                     }
                     """.trimIndent(),
                 )
@@ -251,6 +251,10 @@ fun gradleRunner(projectDir: File, vararg arguments: String): GradleRunner =
         .withArguments(*arguments)
         .withProjectDir(projectDir)
         .withPluginClasspath()
+        .withDebug(RUN_TESTS_IN_DEBUG)
 
-const val JDK_VERSION: String = "11"
-const val KOTLIN_VERSION: String = "1.8.21"
+const val JDK_VERSION: String = "17"
+const val KOTLIN_VERSION: String = "2.2.21"
+
+/* Set this to true when debugging unit tests that use the `gradleRunner()` method */
+const val RUN_TESTS_IN_DEBUG: Boolean = false
