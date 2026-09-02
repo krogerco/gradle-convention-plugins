@@ -337,6 +337,9 @@ To check that the current public API matches the dump files, run:
 
 API dump files are created in `{projectDir}/api/` with a `.api` file for each module.
 
+> [!WARNING]
+> When using Android Gradle Plugin's built in Kotlin, the names of the BCV tasks are changed to `releaseApiDump` and `releaseApiCheck`, as only the release variant of libraries can be configured for ABI checking.
+
 ### Properties
 
 Auto-applying the plugin can be disabled by setting the following property to false in the `gradle.properties` file of the project:
@@ -413,7 +416,6 @@ By default the `Kotlinter` plugin version specifies what version of `ktlint` is 
 ## Dagger
 The following utility functions exist to help configure `Dagger`:
 - **`daggerKsp()`:** adds the `dagger`, `javax:inject`, and `dagger-compiler` dependencies. Optionally adds `dagger-android-processor`, `dagger-android`, and `dagger-android-support` depending on the parameters used. Uses KSP for annotation processing.
-- **`dagger()`:** (Deprecated) same as `daggerKsp()` but uses KAPT for annotation processing and sets `KaptExtension.correctErrorTypes = true`.
 
 ### Version Catalog Requirements
 The following versions are expected in the Version Catalog when using the `Dagger` utility function:
@@ -435,8 +437,6 @@ The following utility functions exist to help configure `Hilt` when auto-configu
   - Adds the Hilt Android Compiler dependency to the `ksp`, `kspTest`, and `kspAndroidTest` configurations.
   - Adds the Hilt Android Testing dependency to the `testImplementation` and `AndroidTestImplementation` configurations.
   - Adds the Androidx Hilt Compiler dependency to the `ksp` configuration when the `androidxHiltCompilter` parameter is true. Default is `false`.
-- **`hilt()` (Deprecated):**
-  - Same as `hiltKsp()` except KAPT is used for annotation processing and sets `KaptExtension.correctErrorTypes = true`.
 
 ### Version Catalog Requirements
 The following versions are expected in the Version Catalog when using Hilt auto-configuration:
