@@ -25,6 +25,7 @@ package com.kroger.gradle.config
 
 import com.android.build.gradle.internal.utils.KSP_PLUGIN_ID
 import dagger.hilt.android.plugin.HiltGradlePlugin
+import io.github.tjokinen.androidbcvbridge.AndroidBcvBridgePlugin
 import kotlinx.kover.gradle.plugin.KoverGradlePlugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalog
@@ -49,17 +50,24 @@ import org.jmailen.gradle.kotlinter.KotlinterPlugin
  * When [isExperimentalEnabled] is true, also enables the built-in Kotlin ABI validation (Kotlin 2.2+).
  */
 @OptIn(ExperimentalAbiValidation::class)
-internal fun Project.configureAbiValidation(isBcvEnabled: Boolean, isExperimentalEnabled: Boolean) {
-    if (isBcvEnabled && !pluginManager.hasPlugin("org.jetbrains.kotlinx.binary-compatibility-validator")) {
-        try {
-            pluginManager.apply("org.jetbrains.kotlinx.binary-compatibility-validator")
-        } catch (_: org.gradle.api.plugins.UnknownPluginException) {
-            logger.warn("Binary Compatibility Validator plugin not found on classpath. Add 'org.jetbrains.kotlinx:binary-compatibility-validator' to enable ABI validation.")
-        }
-    }
-    if (isExperimentalEnabled) {
-        kotlinExtension.configure<AbiValidationExtension> {
-            enabled.set(true)
+internal fun Project.configureAbiValidation(isBcvEnabled: Boolean, isExperimentalEnabled: Boolean, isAgpBuiltInKotlinUsed: Boolean) {
+    if (isBcvEnabled || isExperimentalEnabled) {
+        if (isAgpBuiltInKotlinUsed) {
+            /* This bridge applies and configures ABI validation in a way that works for built in kotlin. Note that the tasks will be named releaseApiCheck and releaseApiDump */
+            pluginManager.apply(AndroidBcvBridgePlugin::class.java)
+        } else {
+            if (isBcvEnabled && !pluginManager.hasPlugin("org.jetbrains.kotlinx.binary-compatibility-validator")) {
+                try {
+                    pluginManager.apply("org.jetbrains.kotlinx.binary-compatibility-validator")
+                } catch (_: org.gradle.api.plugins.UnknownPluginException) {
+                    logger.warn("Binary Compatibility Validator plugin not found on classpath. Add 'org.jetbrains.kotlinx:binary-compatibility-validator' to enable ABI validation.")
+                }
+            }
+            if (isExperimentalEnabled) {
+                kotlinExtension.configure<AbiValidationExtension> {
+                    enabled.set(true)
+                }
+            }
         }
     }
 }
