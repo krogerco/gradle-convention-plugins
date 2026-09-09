@@ -62,7 +62,11 @@ public class KotlinLibraryConventionPlugin : Plugin<Project> {
             tasks.withType<JavaCompile>().configureEach {
                 options.release = kgpVersions.kgpJvmTarget
             }
-            configureAbiValidation(kgpProperties.autoApplyAbiValidation, kgpProperties.autoApplyExperimentalAbiValidation)
+            configureAbiValidation(
+                isBcvEnabled = kgpProperties.autoApplyAbiValidation,
+                isExperimentalEnabled = kgpProperties.autoApplyExperimentalAbiValidation,
+                isAgpBuiltInKotlinUsed = false,
+            )
         }
     }
 }

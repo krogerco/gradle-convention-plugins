@@ -29,6 +29,7 @@ import com.kroger.gradle.util.RootTestProjectBuilder
 import com.kroger.gradle.util.gradleRunner
 import com.kroger.gradle.util.rootProject
 import com.kroger.gradle.util.shouldContainAll
+import com.kroger.gradle.util.shouldNotContainAny
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import org.junit.jupiter.api.BeforeEach
@@ -222,6 +223,24 @@ class AndroidLibraryConventionPluginTest {
             .output
 
         output.shouldContainAll(
+            "releaseApiCheck",
+            "releaseApiDump",
+        )
+    }
+
+    @Test
+    fun `WHEN android library plugin applied using built in kotlin and abi property is false THEN ABI validation tasks do not exist`() {
+        testProjectBuilder.withProperties {
+            put("android.builtInKotlin", "true")
+            put("kgp.plugins.autoapply.abivalidation", "false")
+        }
+        testProjectBuilder.build()
+
+        val output = gradleRunner(testProjectDir, arguments = arrayOf(":android-library:tasks", "--all"))
+            .build()
+            .output
+
+        output.shouldNotContainAny(
             "releaseApiCheck",
             "releaseApiDump",
         )

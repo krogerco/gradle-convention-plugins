@@ -110,6 +110,9 @@ gradlePlugin {
 }
 
 dependencies {
+    /* Most plugin dependencies should be compileOnly. This allows us to compile against the plugin's API, but doesn't
+    force consumers to use our version of it (or to use any version at all, for optionally applied plugins). This does
+    mean that consumers will need to manually include the dependencies they actually do require. */
     compileOnly(libs.gradlePlugins.android)
     compileOnly(libs.gradlePlugins.androidBcvBridge)
     compileOnly(libs.gradlePlugins.androidJunitFramework)
