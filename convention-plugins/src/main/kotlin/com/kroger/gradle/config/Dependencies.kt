@@ -27,6 +27,8 @@ import androidx.room.gradle.RoomExtension
 import androidx.room.gradle.RoomGradlePlugin
 import com.android.build.api.dsl.CommonExtension
 import com.google.devtools.ksp.gradle.KspExtension
+import dev.zacsweers.moshix.ir.gradle.MoshiGradleSubplugin
+import dev.zacsweers.moshix.ir.gradle.MoshiPluginExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.file.RegularFile
@@ -149,11 +151,9 @@ public fun Project.moshi(
     moshiKotlinReflect: Boolean = false,
 ) {
     val moshiVersion = KgpProperties(project).kgpVersions.kgpMoshi
+
     dependencies {
         add(Configurations.IMPLEMENTATION, "com.squareup.moshi:moshi:$moshiVersion")
-        if (codegen) {
-            add(Configurations.KSP, "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion")
-        }
         if (moshiAdapters) {
             add(Configurations.IMPLEMENTATION, "com.squareup.moshi:moshi-adapters:$moshiVersion")
         }
@@ -161,7 +161,25 @@ public fun Project.moshi(
             add(Configurations.IMPLEMENTATION, "com.squareup.moshi:moshi-kotlin:$moshiVersion")
         }
     }
+
+    if (codegen) {
+        // Apply either the Moshi IR compiler plugin or the normal Moshi KSP dependency, depending on the property
+        if (isMoshiIrEnabled()) {
+            pluginManager.apply(MoshiGradleSubplugin::class.java)
+            extensions.configure<MoshiPluginExtension> {
+                applyMoshiDependency.set(false)
+            }
+        } else {
+            dependencies {
+                add(Configurations.KSP, "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion")
+            }
+        }
+    }
 }
+
+private fun Project.isMoshiIrEnabled(): Boolean = providers.gradleProperty(USE_IR_PROPERTY_NAME).orNull == "true"
+
+internal const val USE_IR_PROPERTY_NAME = "kgp.plugins.moshi.useIr"
 
 private fun Project.commonRoomConfig(
     schemaFile: File,

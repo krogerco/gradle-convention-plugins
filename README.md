@@ -507,9 +507,15 @@ The following utility function exists to help configure `Kotlinx Serialization`:
 The following versions are expected in the Version Catalog when using the `kotlinxSerialization()` utility functions:
 - **`kotlinxSerialization`:** The version to use for Kotlinx Serialization dependencies.
 
-## Moshi
+## Moshi (KSP or IR)
+Moshi can be configured, either through KSP (by default) or via Moshix IR. To use IR, include the following Gradle property in your build:
+
+```properties
+kgp.plugins.moshi.useIr=true
+```
+
 The following utility function exists to help configure `Moshi`:
-- **`moshi()`:** adds the `moshi` dependency. If `codegen` is true `moshi-kotlin-codegen` is added to the `ksp` configuration. If `moshiAdapters` is true `moshi-adapters` is included. If `moshiKoltlinReflect` is true then `moshi-kotlin` is included.
+- **`moshi()`:** adds the `moshi` dependency. If `codegen` is true `moshi-kotlin-codegen` is added to the `ksp` configuration, or the Moshi IR plugin is applied instead. If `moshiAdapters` is true `moshi-adapters` is included. If `moshiKoltlinReflect` is true then `moshi-kotlin` is included.
 
 ### Version Catalog Requirements
 The following versions are expected in the Version Catalog when using the `moshi` utility functions:

@@ -128,6 +128,7 @@ dependencies {
     compileOnly(libs.gradlePlugins.kotlinter)
     compileOnly(libs.gradlePlugins.kover)
     compileOnly(libs.gradlePlugins.ksp)
+    compileOnly(libs.gradlePlugins.moshix)
     compileOnly(libs.gradlePlugins.room)
 
     lintChecks(libs.androidx.lint.gradle)

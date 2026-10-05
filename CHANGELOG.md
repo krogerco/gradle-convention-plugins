@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 `gradle-convention-plugins` adheres to [Semantic Versioning](https://semver.org/).
 
+## 2.1.0
+- [Feat]: apply Moshix IR instead of KSP codegen when the property `kgp.plugins.moshi.useIr=true` is used
+
+## 2.0.1
+- [Fix]: respect the property for ABI validation when using built-in kotlin
+
 ## 2.0.0
 - [Breaking]: remove support for KAPT 
 - [Feat]: build against AGP 9's new DSL (consuming projects can still use the old DSL)
