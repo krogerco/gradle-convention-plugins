@@ -23,6 +23,7 @@
  */
 package com.kroger.gradle
 
+import com.kroger.gradle.config.USE_IR_PROPERTY_NAME
 import com.kroger.gradle.util.JDK_VERSION
 import com.kroger.gradle.util.KOTLIN_VERSION
 import com.kroger.gradle.util.RootTestProjectBuilder
@@ -68,7 +69,7 @@ class DependencyTests {
                 addPlugin("com.android.library")
                 addPlugin("com.google.devtools.ksp")
                 appendBuildFile(
-                    """
+                    $$"""
                     android {
                         namespace = "com.kroger.kgp.testmodule"
                     }
@@ -77,16 +78,19 @@ class DependencyTests {
                         listOf("implementation", "debugImplementation", "androidTestImplementation", 
                                "ksp", "kspTest", "kspAndroidTest", "testImplementation", "testRuntimeOnly").forEach { configurationName ->
                             configurations.named(configurationName).configure {
-                                println("CONFIGURATION NAME: ${"$"}name")
-                                dependencies.forEach { println("\t${"$"}name(${"$"}{it.group}:${"$"}{it.name}:${"$"}{it.version})") }
+                                println("CONFIGURATION NAME: $name")
+                                dependencies.forEach { println("\t$name(${it.group}:${it.name}:${it.version})") }
                                 println()
                             }
                         }
                         val hasSerializationPlugin = pluginManager.hasPlugin("org.jetbrains.kotlin.plugin.serialization")
-                        println("Has serialization plugin = ${"$"}hasSerializationPlugin")
+                        println("Has serialization plugin = $hasSerializationPlugin")
                         
                         val hasRoomPlugin = pluginManager.hasPlugin("androidx.room")
-                        println("Has room plugin = ${"$"}hasRoomPlugin")
+                        println("Has room plugin = $hasRoomPlugin")
+                        
+                        val hasMoshixSubplugin = pluginManager.hasPlugin("dev.zacsweers.moshix")
+                        println("Has moshix plugin = $hasMoshixSubplugin")
                     }
                     """.trimIndent(),
                 )
@@ -172,6 +176,32 @@ class DependencyTests {
             "ksp(com.squareup.moshi:moshi-kotlin-codegen:1.0.0)",
             "implementation(com.squareup.moshi:moshi-adapters:1.0.0)",
             "implementation(com.squareup.moshi:moshi-kotlin:1.0.0)",
+            "Has moshix plugin = false",
+        )
+    }
+
+    @Test
+    fun `GIVEN use IR property is true and moshi called with all dependencies true THEN expected dependencies added`() {
+        testProjectBuilder.configureSubproject("android-library-module") {
+            appendBuildFile("moshi(codegen = true, moshiAdapters = true, moshiKotlinReflect = true)")
+        }
+        testProjectBuilder.withProperties {
+            put(USE_IR_PROPERTY_NAME, "true")
+        }
+        testProjectBuilder.build()
+        val output = gradleRunner(testProjectDir, ":android-library-module:tasks")
+            .build()
+            .output
+
+        output.shouldContainAll(
+            "implementation(com.squareup.moshi:moshi:1.0.0)",
+            "implementation(com.squareup.moshi:moshi-adapters:1.0.0)",
+            "implementation(com.squareup.moshi:moshi-kotlin:1.0.0)",
+            "Has moshix plugin = true",
+        )
+
+        output.shouldNotContainAny(
+            "ksp(com.squareup.moshi:moshi-kotlin-codegen:1.0.0)",
         )
     }
 
