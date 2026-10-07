@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 `gradle-convention-plugins` adheres to [Semantic Versioning](https://semver.org/).
 
+## 2.1.1
+- [Fix]: ensure compatibility with JDK 17 consumers regardless of the JVM used to build this project
+
 ## 2.1.0
 - [Feat]: apply Moshix IR instead of KSP codegen when the property `kgp.plugins.moshi.useIr=true` is used
 
